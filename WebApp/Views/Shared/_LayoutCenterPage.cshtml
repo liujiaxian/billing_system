@@ -1,0 +1,581 @@
+﻿@{
+    if (Session["billing_system_user_model"] == null)
+    {
+        Response.Redirect("/Account/Login");
+    }
+    Model.billing_systemEntities db = new Model.billing_systemEntities();
+    int userid = (int)(Session["billing_system_user_model"] as Model.sys_user).user_id;
+    Model.sys_user userinfo = db.sys_user.Where(c => c.user_id == userid).FirstOrDefault();
+    List<Model.vyw_team_user> teamUser = db.vyw_team_user.Where(c => c.userID == userid).ToList();
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>@ViewBag.Title - 记账系统</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <meta name="keywords" content="">
+    <meta name="description" content="这是一款家庭简单的记账系统，可以按照日期计算每个人的收入和支出详细。">
+
+    @Html.Partial("_PartialPageHeader")
+    @RenderSection("header", false)
+</head>
+<body>
+    <div id="theme-wrapper">
+        <header class="navbar" id="header-navbar">
+            <div class="container">
+                <a href="/" id="logo" class="navbar-brand">
+                    <img src="/Content/img/logo.png" alt="" class="normal-logo logo-white" />
+                    <img src="/Content/img/logo-black.png" alt="" class="normal-logo logo-black" />
+                    <img src="/Content/img/logo-small.png" alt="" class="small-logo hidden-xs hidden-sm hidden" />
+                </a>
+                <div class="clearfix">
+                    <button class="navbar-toggle" data-target=".navbar-ex1-collapse" data-toggle="collapse" type="button">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="fa fa-bars"></span>
+                    </button>
+                    <div class="nav-no-collapse navbar-left pull-left hidden-sm hidden-xs">
+                        <ul class="nav navbar-nav pull-left">
+                            <li>
+                                <a class="btn" id="make-small-nav">
+                                    <i class="fa fa-bars"></i>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="nav-no-collapse pull-right" id="header-nav">
+                        <ul class="nav navbar-nav pull-right">
+                            @*<li class="mobile-search">
+                                    <a class="btn">
+                                        <i class="fa fa-search"></i>
+                                    </a>
+                                    <div class="drowdown-search">
+                                        <form role="search">
+                                            <div class="form-group">
+                                                <input type="text" class="form-control" placeholder="搜索...">
+                                                <i class="fa fa-search nav-search-icon"></i>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </li>*@
+                            <!--系统信息-->
+                            @{var syslist = db.sys_notice.Where(c => c.type_id == (int)Utility.Enum_Notice_Type.公告&&c.is_delete==false).OrderByDescending(c => c.notice_id).Take(5).ToList();}
+                            <li class="dropdown hidden-xs">
+                                <a class="btn dropdown-toggle" data-toggle="dropdown">
+                                    <i class="fa fa-warning"></i>
+                                    <span class="count">@(syslist.Count>0?syslist.Count:0)</span>
+                                </a>
+                                <ul class="dropdown-menu notifications-list">
+                                    <li class="pointer">
+                                        <div class="pointer-inner">
+                                            <div class="arrow"></div>
+                                        </div>
+                                    </li>
+                                    @*<li class="item-header">You have 6 new notifications</li>*@
+                                    @if (syslist.Count>0)
+                                    {
+                                        foreach (var item in syslist)
+                                        {
+                                    <li class="item">
+                                        <a href="/center/sysnotice">
+                                            <i class="fa fa-comment"></i>
+                                            <span class="content">@Utility.TextHide.GetSubString(item.msg, 30)</span>
+                                            <span class="time"><i class="fa fa-clock-o"></i>@Convert.ToDateTime(item.create_time).ToChsStr()</span>
+                                        </a>
+                                    </li>
+                                        }
+                                    <li class="item-footer">
+                                        <a href="/center/sysnotice">
+                                            查看更多
+                                        </a>
+                                    </li>
+                                    }
+                                    else
+                                    {
+                                    <li class="item-footer">
+                                        <a href="javascript:;">
+                                            暂无公告消息！
+                                        </a>
+                                    </li>
+                                    }
+                                </ul>
+                            </li>
+                            <!--我的信息-->
+                            @{var list = db.vyw_notice_user.Where(c => (c.user_id == userid||userinfo.user_role==(int)Utility.Enum_User.超级管理员) && c.type_id != (int)Utility.Enum_Notice_Type.公告).OrderByDescending(c => c.notice_id).Take(5).ToList();}
+                            <li class="dropdown hidden-xs">
+                                <a class="btn dropdown-toggle" data-toggle="dropdown">
+                                    <i class="fa fa-envelope-o"></i>
+                                    <span class="count">@(list.Count>0?list.Count:0)</span>
+                                </a>
+                                <ul class="dropdown-menu notifications-list messages-list">
+                                    <li class="pointer">
+                                        <div class="pointer-inner">
+                                            <div class="arrow"></div>
+                                        </div>
+                                    </li>
+                                    @if (list.Count > 0)
+                                    {
+                                        foreach (var item in list)
+                                        {
+                                    <li class="item @(list.IndexOf(item)==0?"first-item":"")">
+                                        <a href="/center/mynotice">
+                                            <img src="@item.user_face" alt="@item.user_name" style="width:35px;height:35px;border-radius:50%;" />
+                                            <span class="content">
+                                                <span class="content-headline">
+                                                    @item.user_nickname
+                                                </span>
+                                                <span class="content-text">
+                                                    @Utility.TextHide.GetSubString(item.msg, 100)
+                                                </span>
+                                            </span>
+                                            <span class="time"><i class="fa fa-clock-o"></i>@Convert.ToDateTime(item.create_time).ToChsStr()</span>
+                                        </a>
+                                    </li>
+                                        }
+                                    <li class="item-footer">
+                                        <a href="/center/mynotice">
+                                            查看更多
+                                        </a>
+                                    </li>
+                                    }
+                                    else
+                                    {
+                                    <li class="item-footer">
+                                        <a href="javascript:;">
+                                            暂无消息！
+                                        </a>
+                                    </li>
+                                    }
+
+                                </ul>
+                            </li>
+                            <!--个人设置-->
+                            <li class="hidden-xs">
+                                <a class="btn" href="/center/personal">
+                                    <i class="fa fa-cog"></i>
+                                </a>
+                            </li>
+                            <!--个人信息-->
+                            <li class="dropdown profile-dropdown">
+                                <a href="/center/personal" class="dropdown-toggle" data-toggle="dropdown">
+                                    <img src="@userinfo.user_face" alt="@userinfo.user_nickname" />
+                                    <span class="hidden-xs">@userinfo.user_name</span> <b class="caret"></b>
+                                </a>
+                                <ul class="dropdown-menu">
+                                    <li><a href="/center/personal"><i class="fa fa-user"></i>账户信息</a></li>
+                                    @*<li><a href="javascript:;" onclick="alertSuccessMsg('开发中，敬请期待！')"><i class="fa fa-cog"></i>系统设置</a></li>*@
+                                    <li><a href="/center/updatepwd"><i class="fa fa-rmb"></i>修改密码</a></li>
+                                    <li><a href="javascript:;" onclick="btn_layout()"><i class="fa fa-power-off"></i>退出</a></li>
+                                </ul>
+                            </li>
+                            <li class="hidden-xxs">
+                                <a class="btn" href="javascript:;" onclick="btn_layout()" title="点击退出">
+                                    <i class="fa fa-power-off"></i>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </header>
+        @if (!string.IsNullOrEmpty(ViewBag.NoticeContent))
+        {
+            <div class="alert alert-info fade in">
+                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                <i class="fa fa-info-circle fa-fw fa-lg"></i>
+                <strong>公告!</strong> @ViewBag.NoticeContent
+            </div>
+        }
+        <div id="page-wrapper" class="container">
+            <div class="row">
+                <div id="nav-col">
+                    <section id="col-left" class="col-left-nano">
+                        <div id="col-left-inner" class="col-left-nano-content">
+                            <div id="user-left-box" class="clearfix hidden-sm hidden-xs">
+                                <img alt="@userinfo.user_nickname" src="@userinfo.user_face" />
+                                <div class="user-box">
+                                    <span class="name">
+                                        欢迎<br />
+                                        @userinfo.user_nickname
+                                    </span>
+                                    <span class="status">
+                                        <i class="fa fa-circle"></i>在线
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="collapse navbar-collapse navbar-ex1-collapse" id="sidebar-nav">
+                                <ul class="nav nav-pills nav-stacked">
+                                    <li class="">
+                                        <a href="/center/index">
+                                            <i class="fa fa-dashboard"></i>
+                                            <span>管理控制台</span>
+                                            <span class="label label-info label-circle pull-right" title="本月交易数">@ViewBag.MonthTradeCount</span>
+                                        </a>
+                                    </li>
+                                    @if (userinfo.user_role == (int)Utility.Enum_User.超级管理员)
+                                    {
+                                        <li>
+                                            <a href="#" class="dropdown-toggle">
+                                                <i class="fa fa-user"></i>
+                                                <span>用户管理</span>
+                                                <i class="fa fa-chevron-circle-right drop-icon"></i>
+                                            </a>
+                                            <ul class="submenu">
+
+                                                <li>
+                                                    <a href="/center/userlist">
+                                                        用户列表
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a href="/center/usersave">
+                                                        添加用户
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                        </li>
+                                    }
+                                    @*<li>
+                                        <a href="#" class="dropdown-toggle">
+                                            <i class="fa fa-money"></i>
+                                            <span>账单管理</span>
+                                            <i class="fa fa-chevron-circle-right drop-icon"></i>
+                                        </a>
+                                        <ul class="submenu">
+                                            <li>
+                                                <a href="javascript:;" onclick="btnAddBilling()">
+                                                    添加账单
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a href="/center/billing">
+                                                    账单记录
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a href="/center/calculation">
+                                                    结算
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </li>*@
+                                    <li>
+                                        <a href="#" class="dropdown-toggle">
+                                            <i class="fa fa-users"></i>
+                                            <span>团队管理</span>
+                                            <i class="fa fa-chevron-circle-right drop-icon"></i>
+                                        </a>
+                                        <ul class="submenu">
+
+                                            <li>
+                                                <a href="/center/team">
+                                                    团队记录
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a href="/center/teamsave">
+                                                    添加团队
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                    <li>
+                                        <a href="#" class="dropdown-toggle">
+                                            <i class="fa fa-envelope"></i>
+                                            <span>消息管理</span>
+                                            <i class="fa fa-chevron-circle-right drop-icon"></i>
+                                        </a>
+                                        <ul class="submenu">
+                                            <li>
+                                                <a href="/center/mynotice">
+                                                    我的消息
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a href="/center/sysnotice">
+                                                    系统消息
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                    <li>
+                                        <a href="#" class="dropdown-toggle">
+                                            <i class="fa fa-cog"></i>
+                                            <span>设置</span>
+                                            <i class="fa fa-chevron-circle-right drop-icon"></i>
+                                        </a>
+                                        <ul class="submenu">
+                                            @*<li>
+                                                    <a href="javascript:;" onclick="alertSuccessMsg('开发中，敬请期待！')">
+                                                        系统设置
+                                                    </a>
+                                                </li>*@
+                                            <li>
+                                                <a href="/center/personal">
+                                                    账户设置
+                                                </a>
+                                                <a href="/center/updatepwd">
+                                                    修改密码
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+
+                <div id="content-wrapper">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <ol class="breadcrumb">
+                                        <li><a href="/">主页</a></li>
+                                        <li class="active"><span>@ViewBag.Title</span></li>
+                                    </ol>
+                                </div>
+                            </div>
+                            @RenderBody()
+                        </div>
+                    </div>
+                    <footer id="footer-bar" class="row">
+                        <p id="footer-copyright" class="col-xs-12">
+                            &copy; 2017 <a href="http://www.jihuiweb.com/" target="_blank">版权所有</a>. Powered by
+                            极晖网络.
+                        </p>
+                    </footer>
+                </div>
+
+
+            </div>
+        </div>
+    </div>
+
+    <div class="md-overlay"></div>
+
+    <div class="md-modal md-effect-10" id="modal-10">
+        <div class="md-content">
+            <div class="modal-header">
+                <button class="md-close close" onclick="btn_close_delete_window()">×</button>
+                <h4 class="modal-title"><span class="confirminfotext">删除</span>提示</h4>
+            </div>
+            <div class="modal-body">
+                <div>您确定<span class="confirminfotext">删除</span>该数据吗？
+                <input type="hidden" id="txt_delete_id" value="0" />
+                <input type="hidden" id="txt_delete_team_id" value="0" />
+                <input type="hidden" id="txt_delete_url" value="" /></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-warning" onclick="btn_close_delete_window()">取消</button>&nbsp;<button type="button" class="btn btn-primary" onclick="btn_delete_data()">确定<span class="confirminfotext">删除</span></button>
+            </div>
+        </div>
+    </div>
+
+    <div class="md-modal md-effect-11" id="modal-11">
+        <div class="md-content">
+            <div class="modal-header">
+                <button class="md-close close" onclick="btn_close_sendmsg_window()">×</button>
+                <h4 class="modal-title">发送疑问信息</h4>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="exampleTextarea">信息内容</label>
+                    <input type="hidden" id="txtBillingId" value="0" />
+                    <input type="hidden" id="txtTypeId" value="0" />
+                    <input type="hidden" id="txtUserId" value="0" />
+                    <textarea class="form-control" id="exampleTextarea" rows="5"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" onclick="btn_close_sendmsg_window()">关闭</button>
+                <button type="button" class="btn btn-primary" onclick="btnConfirmSendMsg()">确定发送</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="md-modal md-effect-13" id="modal-13">
+        <div class="md-content">
+            <div class="modal-header">
+                <button class="md-close close" onclick="btn_close_select_team_window()">×</button>
+                <h4 class="modal-title">请选择团队</h4>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <select class="form-control" id="selectMyTeam">
+                        <option value="0">请选择团队</option>
+                        @if (teamUser.Count > 0)
+                        {
+                            foreach (var item in teamUser)
+                            {
+                                <option value="@item.teamID">@item.teamName</option>
+                            }
+                        }
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" onclick="btn_close_select_team_window()">关闭</button>
+                <button type="button" class="btn btn-primary" onclick="btnSelectTeam()">确定添加</button>
+            </div>
+        </div>
+    </div>
+    @Html.Partial("_PartialPageFooter")
+    <script type="text/javascript">
+        //导航选择
+        $(function () {
+            $("#sidebar-nav .nav li a").each(function () {
+                $this = $(this);
+
+                var val = $(this).parent().parent().siblings("a").hasClass("dropdown-toggle");
+
+                //console.log($this[0].href +"|"+ String(window.location));
+                if ($this[0].href == String(window.location)) {
+                    if (val) {
+                        $this.parent().parent().parent().addClass("open active");
+                        $this.addClass("active");
+                    } else {
+                        $this.parent().addClass("active");
+                    }
+
+                }
+            });
+        });
+
+        function btn_layout() {
+            Loading("退出中，请稍后...")
+            $.post("/Center/Layout", {}, function (data) {
+                LoadClosed();
+                if (data.status == 0) {
+                    alertSuccessMsg(data.msg);
+                    window.location = "/account/login";
+                } else {
+                    alertErrorMsg(data.msg);
+                }
+            }, "json");
+        }
+
+        function btn_delete(url, id, isdelete) {
+            if (isdelete == "true") {
+                $(".confirminfotext").text("恢复");
+            } else {
+                $(".confirminfotext").text("删除");
+            }
+
+            $("#txt_delete_id").val(id);
+            $("#txt_delete_url").val(url);
+            $("#modal-10").addClass("md-show");
+
+        }
+
+        function btn_team_delete(url, id,teamid) {
+            $("#txt_delete_id").val(id);
+            $("#txt_delete_team_id").val(teamid);
+            $("#txt_delete_url").val(url);
+            $("#modal-10").addClass("md-show");
+        }
+
+        function btn_close_delete_window() {
+            $("#modal-10").removeClass("md-show");
+        }
+
+        function btn_delete_data() {
+            Loading("正在删除，请稍后...");
+            var id = $("#txt_delete_id").val();
+            var teamid = $("#txt_delete_team_id").val();
+            var url = $("#txt_delete_url").val();
+
+            $.post(url, { id: id,teamid:teamid }, function (data) {
+                LoadClosed();
+                if (data.status == 0) {
+                    alertSuccessMsg(data.msg);
+                    window.location.reload();
+                } else {
+                    alertErrorMsg(data.msg);
+                }
+            }, "json");
+        }
+
+        //发送信息
+        function btnSendMsg(id, typeid, userid) {
+            $("#modal-11").addClass("md-show");
+            $(".md-overlay").css("opacity", "0.6").css("visibility", "visible");
+            $("#txtBillingId").val(id);
+            $("#txtTypeId").val(typeid);
+            $("#txtUserId").val(userid);
+        }
+
+        function btnConfirmSendMsg() {
+            var id = $("#txtBillingId").val();
+            if (id == "" || id == null) {
+                alertErrorMsg("参数错误，请刷新后重试！");
+                return;
+            }
+            var typeid = $("#txtTypeId").val();
+            if (typeid == "0" || typeid == "" || typeid == null) {
+                alertErrorMsg("参数错误，请刷新后重试！");
+                return;
+            }
+            var userid = $("#txtUserId").val();
+            if (userid == "" || userid == null) {
+                alertErrorMsg("参数错误，请刷新后重试！");
+                return;
+            }
+
+
+            var msg = $("#exampleTextarea").val();
+            if (msg == "" || msg == null) {
+                alertErrorMsg("发送内容不能为空！");
+                return;
+            }
+
+            var pams = {
+                id: id,
+                userid: userid,
+                typeid: typeid,
+                msg: msg
+            };
+
+            Loading("发送中，请稍后...");
+            $.post("/Center/SendMsg", pams, function (data) {
+                LoadClosed();
+                if (data.status == 0) {
+                    $("#exampleTextarea").val('');
+                    alertSuccessMsg(data.msg);
+                    window.location.reload();
+                } else {
+                    alertErrorMsg(data.msg);
+                }
+            }, "json");
+        }
+
+        function btn_close_sendmsg_window() {
+            $("#modal-11").removeClass("md-show");
+            $(".md-overlay").css("opacity", "0").css("visibility", "hidden");
+        }
+
+        function btnAddBilling() {
+            $("#modal-13").addClass("md-show");
+        }
+
+        function btnSelectTeam() {
+            var teamID = $("#selectMyTeam").val();
+            if (isEmpty(teamID)||parseInt(teamID)==0) {
+                alertErrorMsg("请选择团队，如果没有请添加！");
+                return;
+            }
+            window.location = "/center/billingadd?teamid=" + teamID;
+        }
+
+        function btn_close_select_team_window() {
+            $("#modal-13").removeClass("md-show");
+        }
+    </script>
+    @RenderSection("footer", false)
+</body>
+</html>

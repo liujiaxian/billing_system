@@ -1,0 +1,59 @@
+﻿<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>@ViewBag.Title - 记账系统</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <meta name="keywords" content="记账系统">
+    <meta name="description" content="这是一款家庭简单的记账系统，可以按照日期计算每个人的收入和支出详细。">
+    <!-- 此段必须要引入 t为小时级别的时间戳 -->
+    <link type="text/css" href="//g.alicdn.com/sd/ncpc/nc.css" rel="stylesheet" />
+    <script type="text/javascript" src="//g.alicdn.com/sd/ncpc/nc.js"></script>
+    <!-- 引入结束 -->
+    @Html.Partial("_PartialPageHeader")
+    @RenderSection("header", false)
+   
+
+    <style type="text/css">
+        #login-box {
+            overflow: inherit !important;
+        }
+
+        .nc-container .nc_scale span {
+            height: 44px !important;
+            line-height: 44px !important;
+        }
+
+        .nc_scale {
+            height: 44px;
+        }
+
+        #nc_1_n1t {
+            height: 44px;
+        }
+    </style>
+</head>
+<body id="login-page-full">
+    <div id="login-full-wrapper">
+        <div class="container">
+            <div class="row">
+                <div class="col-xs-12">
+                    <div id="login-box">
+                        @RenderBody()
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 此段必须要引入 -->
+    <div id="_umfp" style="display: inline; width: 1px; height: 1px; overflow: hidden"></div>
+    <!-- 引入结束 -->
+    @Html.Partial("_PartialPageFooter")
+    <script src="/Content/js/md5.js"></script>
+    @RenderSection("footer", false)
+</body>
+</html>

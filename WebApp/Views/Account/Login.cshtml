@@ -1,0 +1,118 @@
+﻿@{
+    ViewBag.Title = "登录";
+    Layout = "~/Views/Shared/_LayoutAccountPage.cshtml";
+}
+
+<div id="login-box-holder">
+    <div class="row">
+        <div class="col-xs-12">
+            <header id="login-header">
+                <div id="login-logo">
+                    <a href="/">
+                        <img src="/Content/img/logo.png" alt="记账系统" /></a>
+                </div>
+            </header>
+            <div id="login-box-inner">
+                <div role="form">
+                    <div class="input-group">
+                        <span class="input-group-addon"><i class="fa fa-user"></i></span>
+                        <input class="form-control" type="text" placeholder="用户名/邮箱" id="txtloginid">
+                    </div>
+                    <div class="input-group">
+                        <span class="input-group-addon"><i class="fa fa-key"></i></span>
+                        <input type="password" class="form-control" placeholder="密码" id="txtloginpwd">
+                    </div>
+                    <div id="remember-me-wrapper">
+                        <div class="row">
+                            <div class="col-xs-6">
+                                <div class="checkbox-nice">
+                                    <input type="checkbox" id="remember-me"/>
+                                    <label for="remember-me">
+                                        记住我
+                                    </label>
+                                </div>
+                            </div>
+                            <a href="/account/forgetpwd" id="login-forget-link" class="col-xs-6">忘记密码?
+                            </a>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <button class="btn btn-success col-xs-12" onclick="btn_login()">登录</button>
+                        </div>
+                    </div>
+
+                    @*<div class="row">
+                        <div class="col-xs-12">
+                            <p class="social-text">Or login with</p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-xs-12 col-sm-6">
+                            <button type="submit" class="btn btn-primary col-xs-12 btn-facebook">
+                                <i class="fa fa-facebook"></i>facebook
+                            </button>
+                        </div>
+                        <div class="col-xs-12 col-sm-6">
+                            <button type="submit" class="btn btn-primary col-xs-12 btn-twitter">
+                                <i class="fa fa-twitter"></i>Twitter
+                            </button>
+                        </div>
+                    </div>*@
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+<div id="login-box-footer">
+    <div class="row">
+        <div class="col-xs-12">
+            没有账号吗?
+      <a href="/account/register">立即注册
+      </a>
+        </div>
+        <div class="col-xs-12">
+            测试账号test 测试密码123456
+        </div>
+    </div>
+</div>
+
+@section footer{
+    <script type="text/javascript">
+        function btn_login() {    
+            var name = $("#txtloginid").val();
+            if (isEmpty(name)) {
+                alertErrorMsg("登录账号不能为空！");
+                return;
+            }
+
+            var pwd = $("#txtloginpwd").val();
+            if (isEmpty(pwd)) {
+                alertErrorMsg("登录密码不能为空！");
+                return;
+            }
+
+            var ischeck = $("#remember-me").prop("checked");
+
+            var pams = {
+                name: name,
+                pwd: hex_md5(pwd),
+                checked:ischeck
+            };
+
+            Loading("登录中，请稍后...")
+            $.post("/Account/Login", pams, function (data) {
+                LoadClosed();
+                if (data.status == 0) {
+                    alertSuccessMsg(data.msg);
+                    window.location = "/center/index";
+                } else {
+                    alertErrorMsg(data.msg);
+                }
+            }, "json");
+
+        }
+    </script>
+      
+}

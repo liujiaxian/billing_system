@@ -1,0 +1,238 @@
+﻿@{
+    ViewBag.Title = "我的团队";
+    Layout = "~/Views/Shared/_LayoutCenterPage.cshtml";
+    List<Model.vyw_team_user> list = ViewData["list"] as List<Model.vyw_team_user>;
+    string[] color = { "emerald-bg", "green-bg", "red-bg", "yellow-bg", "purple-bg", "gray-bg" };
+    Model.billing_systemEntities db = new Model.billing_systemEntities();
+    String month = DateTime.Now.ToString("yyyy-MM");
+    String year = DateTime.Now.ToString("yyyy");
+    long userID = ViewBag.UserID;
+    DateTime now = DateTime.Now;
+    DateTime d1 = new DateTime(now.Year, now.Month, 1);
+    DateTime d2 = d1.AddMonths(1).AddDays(-1);
+    DateTime dtFirstDay = new DateTime(DateTime.Now.Year, 1, 1);
+    DateTime dtLastDay = dtFirstDay.AddYears(1).AddDays(-1);
+    string wend = now.ToString("yyyy-MM-dd");
+    string wstart = now.AddDays(-7).ToString("yyyy-MM-dd");
+}
+
+@section header{
+    <style type="text/css">
+        .project-box .project-box-ultrafooter .link {
+            height: 26px;
+        }
+    </style>
+}
+
+<div class="row">
+    @if (list.Count > 0)
+    {
+        foreach (var item in list)
+        {
+            var userList = db.vyw_team_user.Where(c => c.teamID == item.teamID).OrderBy(c => c.teamUserID).Skip(0).Take(5).ToList();
+            Random rdm = new Random();
+            var result = db.billing_log.Where(c => c.team_id == item.teamID);
+            var weekMoney = Math.Round((from d in result.ToList() where d.trade_time > DateTime.Now.AddDays(-7) select d).Sum(d => d.money), 2);
+            var monthMoney = Math.Round((from d in result.ToList() where d.trade_time.ToString("yyyy-MM") == month select d).Sum(d => d.money), 2);
+            var yearMoney = Math.Round((from d in result.ToList() where d.trade_time.ToString("yyyy") == year select d).Sum(d => d.money), 2);
+            var allTeamMoney = (from d in result.ToList() select d).Sum(d => d.money);
+            var allUserMoney = db.billing_log.Where(c => c.user_id == userID && c.team_id == item.teamID).Count() > 0 ? db.billing_log.Where(c => c.user_id == userID && c.team_id == item.teamID).Sum(c => c.money) : 0;
+
+            <div class="col-lg-4 col-md-6 col-sm-6">
+                <div class="main-box clearfix project-box emerald-box">
+                    <div class="main-box-body clearfix">
+                        <div class="project-box-header @color[rdm.Next(color.Length)]">
+                            <div class="name">
+                                <a href="/center/billing?teamid=@item.teamID">
+                                    @item.teamName
+                                </a>
+                            </div>
+                        </div>
+                        <div class="project-box-content" title="团队/总额">
+                            <span class="chart" data-percent="@(allTeamMoney==0?0:Math.Round(allUserMoney / allTeamMoney, 2) * 100)">
+                                <span class="percent">@(allTeamMoney == 0 ? 0 : Math.Round(allUserMoney / allTeamMoney, 2) * 100)</span>%<br>
+                                <span class="lbl">支出率</span>
+                                <canvas height="130" width="130"></canvas>
+                            </span>
+                        </div>
+                        <div class="project-box-footer clearfix">
+                            <a href="/center/billing?teamid=@item.teamID&stime=@wstart&etime=@wend">
+                                <span class="value">@weekMoney</span>
+                                <span class="label">本周支出</span>
+                            </a>
+                            <a href="/center/billing?teamid=@item.teamID&stime=@d1.ToString("yyyy-MM-dd")&etime=@d2.ToString("yyyy-MM-dd")">
+                                <span class="value">@monthMoney</span>
+                                <span class="label">本月支出</span>
+                            </a>
+                            <a href="/center/billing?teamid=@item.teamID&stime=@dtFirstDay.ToString("yyyy-MM-dd")&etime=@dtLastDay.ToString("yyyy-MM-dd")">
+                                <span class="value">@yearMoney</span>
+                                <span class="label">本年支出</span>
+                            </a>
+                        </div>
+                        <div class="project-box-ultrafooter clearfix">
+                            @if (userList.Count > 0)
+                            {
+                                foreach (var item1 in userList)
+                                {
+                                    <img class="project-img-owner" alt="用户头像" src="@(item1.user_face == null ? "/Content/img/default_headpic.png" : item1.user_face)" data-toggle="tooltip" title="@(item1.user_nickname)" data-original-title="@(item1.user_nickname)">
+                                }
+                            }
+                            <a href="javascript:;" onclick="window.location = '/center/teammember/@item.teamID'" class="link pull-right">
+                                <i class="fa fa-arrow-circle-right fa-lg"></i>
+                            </a>
+                            <a href="javascript:;" onclick="showSearch('@item.teamID')" class="link pull-right" title="邀请队友">
+                                <i class="fa fa-plus fa-lg"></i>&nbsp;
+                            </a>
+                            @if (item.status == (int)Utility.Enum_Inviter_Status.邀请中)
+                            {
+                                <a href="javascript:;" onclick="showInvition('@item.teamID','@item.teamName','@(item.parentNickName==null?item.parentName:item.parentNickName)')" class="link pull-right" title="邀请通知">
+                                    <i class="fa fa-bell-o fa-lg"></i>&nbsp;
+                                </a>
+                            }
+                            <a href="javascript:;" onclick="btn_team_delete('/center/teamdelete','@item.teamUserID','@item.teamID')" class="link pull-right" title="删除团队">
+                                <i class="fa fa-trash-o fa-lg"></i>&nbsp;
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        <div class="col-lg-4 col-md-6 col-sm-6 col-xs-12">
+            <div style="margin-left:15px;">暂无团队！</div>
+        </div>
+    }
+</div>
+
+<div class="md-modal md-effect-13" id="modal-13">
+    <div class="md-content">
+        <div class="modal-header">
+            <button class="md-close close" onclick="btnCloseShowWindow()">×</button>
+            <h4 class="modal-title">搜索队友</h4>
+        </div>
+        <div class="modal-body">
+            <div class="form-group">
+                <label for="txtUserName">队友信息</label>
+                <input type="text" class="form-control" id="txtUserName" placeholder="队友名称或邮箱" style="width:100%;">
+                <input type="hidden" id="txtTeamID" value="0" />
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" onclick="btnCloseShowWindow()">关闭</button>
+                <button type="button" class="btn btn-primary" onclick="btnSendInviter()">发出邀请</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="md-modal md-effect-12" id="modal-12">
+    <div class="md-content">
+        <div class="modal-header">
+            <button class="md-close close" onclick="btnCloseInvitionShowWindow()">×</button>
+            <h4 class="modal-title">邀请通知</h4>
+        </div>
+        <div class="modal-body">
+            <div class="form-group">
+                <div class="alert alert-block alert-success fade in">
+                    <input type="hidden" class="teamID" value="" />
+                    <h4 class="teamName"></h4>
+                    <p class="teamContent"></p>
+                    <br />
+                    <p>
+                        <a class="btn btn-default" href="javascript:;" onclick="btnInvitionClick('false')">拒绝邀请</a> <a class="btn btn-success" href="javascript:;" onclick="btnInvitionClick('true')">同意邀请</a> 
+                    </p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" onclick="btnCloseInvitionShowWindow()">关闭</button>
+            </div>
+        </div>
+    </div>
+</div>
+@section footer{
+    <script src="~/Content/js/jquery.easypiechart.min.js"></script>
+    <script>
+        $(function () {
+            $('.chart').easyPieChart({
+                easing: 'easeOutBounce',
+                onStep: function (from, to, percent) {
+                    $(this.el).find('.percent').text(Math.round(percent));
+                },
+                barColor: '#3498db',
+                trackColor: '#f2f2f2',
+                scaleColor: false,
+                lineWidth: 8,
+                size: 130,
+                animate: 1500
+            });
+        });
+
+        function showSearch(teamID) {
+            $("#txtUserName").val("");
+            $("#modal-13").addClass("md-show");
+            $(".md-overlay").css("opacity", "0.6").css("visibility", "visible");
+            $("#txtTeamID").val(teamID);
+            $("#txtUserID").val(userID);
+        }
+
+        function showInvition(teamID,teamName,userName) {
+            $("#modal-12").addClass("md-show");
+            $(".md-overlay").css("opacity", "0.6").css("visibility", "visible");
+            $(".teamID").val(teamID);
+            $(".teamName").text(teamName);
+            $(".teamContent").text(userName+"邀请您加入"+teamName+"这个大家庭！");
+        }
+
+        function btnCloseShowWindow() {
+            $("#modal-13").removeClass("md-show");
+            $(".md-overlay").css("opacity", "0").css("visibility", "hidden");
+        }
+
+        function btnCloseInvitionShowWindow() {
+            $("#modal-12").removeClass("md-show");
+            $(".md-overlay").css("opacity", "0").css("visibility", "hidden");
+        }
+
+        function btnSendInviter() {
+            var teamID = $("#txtTeamID").val();
+            if (parseInt(teamID) <= 0) {
+                alertErrorMsg("参数错误！");
+                return;
+            }
+
+            var userName = $("#txtUserName").val();
+            if (isEmpty(userName)) {
+                alertErrorMsg("用户信息不能为空！");
+                return;
+            }
+
+            var pams = {
+                teamID: teamID,
+                userName: userName
+            };
+
+            $.post("/Center/SendInviter", pams, function (serverData) {
+                if (serverData.status == 0) {
+                    alertSuccessMsg(serverData.msg);
+                    window.location.reload();
+                } else {
+                    alertErrorMsg(serverData.msg);
+                }
+            }, "json");
+        }
+
+        function btnInvitionClick(flag) {
+            var teamID = $(".teamID").val();
+            $.post("/center/invition", { flag: flag,teamID:teamID }, function (data) {
+                if (data.status == 0) {
+                    alertSuccessMsg(data.msg);
+                    btnCloseInvitionShowWindow();
+                    window.location.reload();
+                } else {
+                    alertErrorMsg(data.msg);
+                }
+            },"json");
+        }
+    </script>
+}

@@ -1,0 +1,137 @@
+﻿@{
+    ViewBag.Title = "账单结算";
+    Layout = "~/Views/Shared/_LayoutCenterPage.cshtml";
+    List<Model.vyw_team_user> teamlist = ViewData["teamlist"] as List<Model.vyw_team_user>;
+}
+
+
+@section header{
+    <style type="text/css">
+        .radio {
+            padding-left: 8px;
+        }
+    </style>
+}
+<div class="row">
+    <div class="col-lg-12">
+        <div class="main-box">
+            <header class="main-box-header clearfix">
+                <h2>账单结算</h2>
+            </header>
+            <div class="main-box-body clearfix">
+                <div class="form-group">
+                    <label>所属团队</label>
+                    <select class="form-control" id="txtteam">
+                        <option value="0">全部</option>
+                        @if (teamlist.Count > 0)
+                        {
+                            foreach (var item in teamlist)
+                            {
+                                if (Request["teamid"].ToInt32() == item.teamID)
+                                {
+                                    <option value="@item.teamID" selected>@item.teamName</option>
+                                }
+                                else
+                                {
+                                    <option value="@item.teamID">@item.teamName</option>
+                                }
+
+                            }
+                        }
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="control-label" for="txtstarttime">开始时间</label>
+                    <input type="text" class="form-control" id="txtstarttime" onfocus="WdatePicker({ dateFmt: 'yyyy-MM-dd' })" readonly="readonly">
+                </div>
+                <div class="form-group">
+                    <label class="control-label" for="txtendtime">结束时间</label>
+                    <input type="text" class="form-control" id="txtendtime" onfocus="WdatePicker({ minDate: '#F{$dp.$D(\'txtstarttime\')}', dateFmt: 'yyyy-MM-dd' })" readonly="readonly">
+                </div>
+                <button class="btn btn-success" onclick="btn_billing_calculation()">确定结算</button>
+                <br>
+                <br>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="md-modal md-effect-5" id="modal-5">
+    <div class="md-content">
+        <div class="modal-header">
+            <button class="md-close close" onclick="btn_close_calculation_window()">×</button>
+            <h4 class="modal-title">计算结果</h4>
+        </div>
+        <div class="modal-body">
+
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-default" onclick="btn_close_calculation_window()">关闭</button>
+        </div>
+    </div>
+</div>
+
+@section footer{
+    <script src="~/Content/My97DatePicker/WdatePicker.js"></script>
+    <script type="text/javascript">
+        function btn_billing_calculation() {
+          
+            var starttime = $("#txtstarttime").val();
+            if (isEmpty(starttime)) {
+                alertErrorMsg("交易开始时间不能为空！");
+                return;
+            }
+
+            var endtime = $("#txtendtime").val();
+            if (isEmpty(endtime)) {
+                alertErrorMsg("交易结束时间不能为空！");
+                return;
+            }
+
+            var teamid = $("#txtteam").val();
+
+            var pams = {
+                starttime: starttime,
+                endtime: endtime,
+                teamID :teamid
+            };
+
+            Loading("计算中，请稍后...")
+            $.post("/Center/Calculation", pams, function (data) {
+                LoadClosed();
+                if (data.status == 0) {
+                    //alertSuccessMsg(data.msg);
+                    $("#modal-5").addClass("md-show");
+                    $(".md-overlay").css("opacity", "0.6").css("visibility", "visible");
+                    appendData(data.data);
+                } else {
+                    alertErrorMsg(data.msg);
+                }
+            }, "json");
+        }
+
+        function appendData(data) {
+            var jsondata = $.parseJSON(data);
+            var _html = '';
+            for (var i = 0; i < jsondata.length; i++) {
+                _html += '<h3><span>' + jsondata[i].tradeuser + '</span></h3>';
+
+                _html += '<ul class="list-group">';
+                var datas = $.parseJSON(jsondata[i].participantuser);
+                for (var j = 0; j < datas.length; j++) {
+                    _html += '<li class="list-group-item"><span class="badge badge-primary">' + datas[j].usermoney + '</span>' + datas[j].user + '</li></div>';
+                }
+                _html += '</ul>';
+            }
+
+            $(".modal-body").html(_html);
+        }
+
+        //关闭窗口
+        function btn_close_calculation_window() {
+            $("#modal-5").removeClass("md-show");
+            $(".md-overlay").css("opacity", "0").css("visibility", "hidden");
+        }
+    </script>
+}

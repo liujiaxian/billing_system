@@ -1,0 +1,392 @@
+﻿@{
+    ViewBag.Title = "主页";
+    Layout = "~/Views/Shared/_LayoutCenterPage.cshtml";
+    Model.sys_user usermodel = ViewData["userinfo"] as Model.sys_user;
+    int year = DateTime.Now.Year; int month = DateTime.Now.Month;
+}
+
+@section header{
+    <link rel="stylesheet" href="/Content/css/libs/fullcalendar.css" type="text/css" />
+    <link rel="stylesheet" href="/Content/css/libs/fullcalendar.print.css" type="text/css" media="print" />
+    <link rel="stylesheet" href="/Content/css/compiled/calendar.css" type="text/css" media="screen" />
+    <link rel="stylesheet" href="/Content/css/libs/morris.css" type="text/css" />
+    <link rel="stylesheet" href="/Content/css/libs/daterangepicker.css" type="text/css" />
+    <link rel="stylesheet" href="/Content/css/libs/jquery-jvectormap-1.2.2.css" type="text/css" />
+
+    <link rel="stylesheet" type="text/css" href="/Content/css/libs/magnific-popup.css">
+}
+
+<div class="row">
+    <div class="col-lg-3 col-sm-6 col-xs-12">
+        <div class="main-box infographic-box">
+            <i class="fa fa-user red-bg"></i>
+            <span class="headline">用户量</span>
+            <span class="value">
+                <span class="timer" data-from="120" data-to="2562" data-speed="1000" data-refresh-interval="50">
+                    @ViewBag.UserCount
+                </span>
+            </span>
+        </div>
+    </div>
+    <div class="col-lg-3 col-sm-6 col-xs-12">
+        <div class="main-box infographic-box">
+            <i class="fa fa-shopping-cart emerald-bg"></i>
+            <span class="headline">支出金额</span>
+            <span class="value">
+                <span class="timer" data-from="30" data-to="658" data-speed="800" data-refresh-interval="30" data-toggle="tooltip" title="@(ViewBag.MoneyCount)" data-original-title="@(ViewBag.MoneyCount)">
+                    @(Utility.HtmlHelper.ToMoneyStr(Convert.ToDecimal(ViewBag.MoneyCount)))
+                </span>
+            </span>
+        </div>
+    </div>
+    <div class="col-lg-3 col-sm-6 col-xs-12">
+        <div class="main-box infographic-box">
+            <i class="fa fa-money green-bg"></i>
+            <span class="headline">收入金额</span>
+            <span class="value">
+                <span class="timer" data-from="83" data-to="8400" data-speed="900" data-refresh-interval="60">
+                    @ViewBag.MoneyIncome
+                </span>
+            </span>
+        </div>
+    </div>
+    <div class="col-lg-3 col-sm-6 col-xs-12">
+        <div class="main-box infographic-box">
+            <i class="fa fa-eye yellow-bg"></i>
+            <span class="headline">访问量</span>
+            <span class="value">
+                <span class="timer" data-from="539" data-to="12526" data-speed="1100">
+                    @ViewBag.LoginCount
+                </span>
+            </span>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-12 col-lg-12">
+        <div class="main-box">
+            <div class="row">
+                <div class="col-md-9">
+                    <div class="graph-box emerald-bg">
+                        <h2>
+                            支出统计<span class="pull-right">
+                                <select class="form-control" onchange="btnGroupDataSelect(this.value)" id="txtSelectTime">
+                                    @for (int i = 01; i < 13; i++)
+                                    {
+                                        if (month == i)
+                                        {
+                                            <option selected value="@(year+"-"+(i>10?i.ToString():"0"+i))">@(i)月</option>
+                                        }
+                                        else
+                                        {
+                                            <option value="@(year + "-" + (i > 10 ? i.ToString() : "0" + i))">@(i)月</option>
+                                        }
+                                    }
+                                    @for (int i = DateTime.Now.Year; i >= 2016; i--)
+                                    {
+                                        <option value="@i">@(i)年</option>
+                                    }
+                                </select>
+                            </span>
+                        </h2>
+                        <div class="graph" id="graph-line" style="max-height: 335px;"></div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="row graph-nice-legend">
+                        <div class="graph-legend-row col-md-12 col-sm-4">
+                            <div class="graph-legend-row-inner">
+                                <span class="graph-legend-name">
+                                    本日支出
+                                </span>
+                                <span class="graph-legend-value">
+                                    ￥@ViewBag.DayMoney
+                                </span>
+                            </div>
+                        </div>
+                        <div class="graph-legend-row col-md-12 col-sm-4">
+                            <div class="graph-legend-row-inner">
+                                <span class="graph-legend-name">
+                                    本周支出
+                                </span>
+                                <span class="graph-legend-value">
+                                    ￥@ViewBag.WeekAllMoney
+                                </span>
+                            </div>
+                        </div>
+                        <div class="graph-legend-row col-md-12 col-sm-4">
+                            <div class="graph-legend-row-inner">
+                                <span class="graph-legend-name">
+                                    本月支出
+                                </span>
+                                <span class="graph-legend-value">
+                                    ￥@ViewBag.MonthMoney
+                                </span>
+                            </div>
+                        </div>
+                        <div class="graph-legend-row col-md-12 col-sm-4">
+                            <div class="graph-legend-row-inner">
+                                <span class="graph-legend-name">
+                                    本年支出
+                                </span>
+                                <span class="graph-legend-value">
+                                    ￥@ViewBag.YearMoney
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-lg-12">
+        <div class="main-box clearfix">
+            <header class="main-box-header clearfix">
+                <h2 class="pull-left">最新账单</h2>
+                <div class="filter-block pull-right">
+                    @*<div class="form-group pull-left">
+                            <input type="text" class="form-control" placeholder="Search...">
+                            <i class="fa fa-search search-icon"></i>
+                        </div>*@
+                    <a href="/center/billing" class="btn btn-primary pull-right">
+                        <i class="fa fa-eye fa-lg"></i> 浏览更多
+                    </a>
+                </div>
+            </header>
+            <div class="main-box-body clearfix">
+                <div class="table-responsive">
+                    <table id="table-example-fixed" class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th width="8%">编号</th>
+                                <th width="8%">交易用户</th>
+                                <th width="15%">参与用户</th>
+                                <th width="8%">交易金额</th>
+                                <th>交易详细</th>
+                                <th width="8%">所属团队</th>
+                                <th width="12%">交易时间</th>
+                                <th width="12%">添加时间</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @{List<Model.vyw_billing_log_team> list = ViewData["billinglist"] as List<Model.vyw_billing_log_team>;}
+                            @if (list != null)
+                            {
+                                foreach (var item in list)
+                                {
+                                    <tr>
+                                        <td>@(list.IndexOf(item)+1)</td>
+                                        <td>@item.trade_user</td>
+                                        <td>@item.participant_user_name</td>
+                                        <td><span class="label label-warning">￥@Convert.ToDecimal(item.money).ToString("0.00") </span></td>
+                                        <td>@item.remark</td>
+                                        <td><span class="label label-primary">@item.teamName</span></td>
+                                        <td>@Convert.ToDateTime(item.trade_time).ToString("yyyy-MM-dd HH:mm:ss")</td>
+                                        <td>@Convert.ToDateTime(item.create_time).ToString("yyyy-MM-dd HH:mm:ss")</td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr><td colspan="7">暂无账单记录！</td></tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-4 col-sm-6 col-xs-12">
+        <div class="main-box small-graph-box red-bg">
+            <span class="value">@(ViewBag.MoneyRate)%</span>
+            <span class="headline">本月总支出率</span>
+            <div class="progress">
+                <div style="width: @(ViewBag.MoneyRate)%;" aria-valuemax="100" aria-valuemin="0"
+                     aria-valuenow="@ViewBag.MoneyRate" role="progressbar" class="progress-bar">
+                    <span class="sr-only">@(ViewBag.MoneyRate)% Complete</span>
+                </div>
+            </div>
+            <span class="subinfo">
+                @if (Convert.ToDecimal(ViewBag.LastMoneyRate) > 0)
+                {
+                    <i class="fa fa-arrow-circle-o-up"></i> <span>同比上月增长 @(ViewBag.LastMoneyRate)%</span>
+                }
+                else if (Convert.ToDecimal(ViewBag.LastMoneyRate) < 0)
+                {
+                    <i class="fa fa-arrow-circle-o-down"></i> <span>同比上月下降 @(ViewBag.LastMoneyRate)%</span>
+                }
+                else
+                {
+                    <i class="fa fa-arrows-h"></i> <span>同比上月持平</span>
+                }
+            </span>
+            <span class="subinfo">
+                <i class="fa fa-users"></i> 最近一周总支出 ￥@ViewBag.WeekMoney
+            </span>
+        </div>
+    </div>
+    <div class="col-md-4 col-sm-6 col-xs-12">
+        <div class="main-box small-graph-box emerald-bg">
+            <span class="value">@(ViewBag.TradeRate)%</span>
+            <span class="headline">本月支出率</span>
+            <div class="progress">
+                <div style="width: @(ViewBag.TradeRate)%;" aria-valuemax="100" aria-valuemin="0"
+                     aria-valuenow="@ViewBag.TradeRate" role="progressbar" class="progress-bar">
+                    <span class="sr-only">@(ViewBag.TradeRate)% Complete</span>
+                </div>
+            </div>
+            <span class="subinfo">
+                @if (Convert.ToDecimal(ViewBag.LastTradeRate) > 0)
+                {
+                    <i class="fa fa-arrow-circle-o-up"></i> <span>同比上月增长 @(ViewBag.LastTradeRate)%</span>
+                }
+                else if (Convert.ToDecimal(ViewBag.LastTradeRate) < 0)
+                {
+                    <i class="fa fa-arrow-circle-o-down"></i> <span>同比上月下降 @(ViewBag.LastTradeRate)%</span>
+                }
+                else
+                {
+                    <i class="fa fa-arrows-h"></i> <span>同比上月持平</span>
+                }
+            </span>
+            <span class="subinfo">
+                <i class="fa fa-globe"></i> 我最近一周支出 ￥@ViewBag.WeekUserTrade
+            </span>
+        </div>
+    </div>
+    <div class="col-md-4 col-sm-6 col-xs-12 hidden-sm">
+        <div class="main-box small-graph-box green-bg">
+            <span class="value">@(ViewBag.ParticipantRate)%</span>
+            <span class="headline">本月参与率</span>
+            <div class="progress">
+                <div style="width: @(ViewBag.ParticipantRate)%;" aria-valuemax="100" aria-valuemin="0"
+                     aria-valuenow="@ViewBag.ParticipantRate" role="progressbar" class="progress-bar">
+                    <span class="sr-only">@(ViewBag.ParticipantRate)% Complete</span>
+                </div>
+            </div>
+            <span class="subinfo">
+                @if (Convert.ToDecimal(ViewBag.LastParticipantRate) > 0)
+                {
+                    <i class="fa fa-arrow-circle-o-up"></i> <span>同比上月增长 @(ViewBag.LastParticipantRate)%</span>
+                }
+                else if (Convert.ToDecimal(ViewBag.LastParticipantRate) < 0)
+                {
+                    <i class="fa fa-arrow-circle-o-down"></i> <span>同比上月下降 @(ViewBag.LastParticipantRate)%</span>
+                }
+                else
+                {
+                    <i class="fa fa-arrows-h"></i> <span>同比上月持平</span>
+                }
+            </span>
+            <span class="subinfo">
+                <i class="fa fa-shopping-cart"></i> 最近一周参与 @ViewBag.WeekUserParticipant
+            </span>
+        </div>
+    </div>
+</div>
+
+@section footer{
+    <script src="/Content/js/jquery-ui.custom.min.js"></script>
+    <script src="/Content/js/fullcalendar.min.js"></script>
+    <script src="/Content/js/jquery.slimscroll.min.js"></script>
+    <script src="/Content/js/raphael-min.js"></script>
+    <script src="/Content/js/morris.min.js"></script>
+    <script src="/Content/js/moment.min.js"></script>
+    <script src="/Content/js/daterangepicker.js"></script>
+    <script src="/Content/js/jquery-jvectormap-1.2.2.min.js"></script>
+    <script src="/Content/js/jquery-jvectormap-world-merc-en.js"></script>
+    <script src="/Content/js/gdp-data.js"></script>
+    <script src="/Content/js/flot/jquery.flot.js"></script>
+    <script src="/Content/js/flot/jquery.flot.min.js"></script>
+    <script src="/Content/js/flot/jquery.flot.pie.min.js"></script>
+    <script src="/Content/js/flot/jquery.flot.stack.min.js"></script>
+    <script src="/Content/js/flot/jquery.flot.resize.min.js"></script>
+    <script src="/Content/js/flot/jquery.flot.time.min.js"></script>
+    <script src="/Content/js/flot/jquery.flot.threshold.js"></script>
+    <script>
+        $(document).ready(function () {    
+            //WORLD MAP
+            $('#world-map').vectorMap({
+                map: 'world_merc_en',
+                backgroundColor: '#ffffff',
+                zoomOnScroll: false,
+                regionStyle: {
+                    initial: {
+                        fill: '#e1e1e1',
+                        stroke: 'none',
+                        "stroke-width": 0,
+                        "stroke-opacity": 1
+                    },
+                    hover: {
+                        "fill-opacity": 0.8
+                    },
+                    selected: {
+                        fill: '#8dc859'
+                    },
+                    selectedHover: {}
+                },
+                series: {
+                    regions: [{
+                        values: gdpData,
+                        scale: ['#6fc4fe', '#2980b9'],
+                        normalizeFunction: 'polynomial'
+                    }]
+                },
+                onRegionLabelShow: function (e, el, code) {
+                    el.html(el.html() + ' (' + gdpData[code] + ')');
+                }
+            });
+
+            //按年月日分组
+            getData($("#txtSelectTime").val());
+        });
+
+        //分组选择数据
+        function btnGroupDataSelect(value) {
+            getData(value)
+        }
+
+       
+        function getData(timeFormat) {
+            var array = new Array();
+            $.post("/Center/GetData", { timeFormat: timeFormat }, function (data) {
+                if (data.status == 0) {
+                    var json = $.parseJSON(data.data);
+                    for (var i = 0; i < json.length; i++) {
+                        var object = {};
+                        object.time = json[i].time;
+                        object.money = json[i].money;
+                        array[i] = object;
+                    }
+                    //console.log(array);
+                    loadData(array);
+                }
+            }, "json");
+        }
+
+        
+
+        function loadData(data) {
+            //CHARTS
+            $('#graph-line').empty();
+            Morris.Line({
+                element: 'graph-line',
+                data: data,
+                lineColors: ['#ffffff'],
+                xkey: 'time',
+                ykeys: ['money'],
+                labels: ['支出金额'],
+                pointSize: 3,
+                hideHover: 'auto',
+                gridTextColor: '#ffffff',
+                gridLineColor: 'rgba(255, 255, 255, 0.3)',
+                resize: true,
+                parseTime: false　　//注意
+            });
+        }
+    </script>
+}

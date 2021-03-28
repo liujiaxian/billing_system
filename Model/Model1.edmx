@@ -1,0 +1,575 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="2.0" xmlns:edmx="http://schemas.microsoft.com/ado/2008/10/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+    <Schema Namespace="billing_systemModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2005" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/02/edm/ssdl">
+        <EntityType Name="billing_log">
+          <Key>
+            <PropertyRef Name="billing_id" />
+          </Key>
+          <Property Name="billing_id" Type="bigint" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="user_id" Type="bigint" Nullable="false" />
+          <Property Name="trade_type" Type="bit" Nullable="false" />
+          <Property Name="participant_user_id" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="money" Type="money" Nullable="false" />
+          <Property Name="remark" Type="nvarchar" MaxLength="250" Nullable="false" />
+          <Property Name="is_delete" Type="bit" Nullable="false" />
+          <Property Name="trade_user" Type="nvarchar" MaxLength="50" />
+          <Property Name="participant_user_name" Type="nvarchar" MaxLength="250" />
+          <Property Name="trade_time" Type="datetime" Nullable="false" />
+          <Property Name="team_id" Type="bigint" Nullable="false" />
+          <Property Name="create_time" Type="datetime" Nullable="false" />
+          <Property Name="update_time" Type="datetime" Nullable="false" />
+        </EntityType>
+        <EntityType Name="sys_notice">
+          <Key>
+            <PropertyRef Name="notice_id" />
+          </Key>
+          <Property Name="notice_id" Type="bigint" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="user_id" Type="bigint" Nullable="false" />
+          <Property Name="msg" Type="nvarchar" MaxLength="500" Nullable="false" />
+          <Property Name="type_id" Type="int" Nullable="false" />
+          <Property Name="is_delete" Type="bit" Nullable="false" />
+          <Property Name="billing_id" Type="bigint" />
+          <Property Name="create_time" Type="datetime" />
+          <Property Name="update_time" Type="datetime" />
+        </EntityType>
+        <EntityType Name="sys_user">
+          <Key>
+            <PropertyRef Name="user_id" />
+          </Key>
+          <Property Name="user_id" Type="bigint" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="user_name" Type="nvarchar" MaxLength="20" />
+          <Property Name="user_nickname" Type="nvarchar" MaxLength="20" />
+          <Property Name="user_email" Type="nvarchar" MaxLength="32" />
+          <Property Name="user_password" Type="nvarchar" MaxLength="32" />
+          <Property Name="user_role" Type="int" />
+          <Property Name="user_face" Type="nvarchar" MaxLength="250" />
+          <Property Name="apply_status" Type="int" />
+          <Property Name="email_token" Type="nvarchar" MaxLength="50" />
+          <Property Name="email_token_time" Type="datetime" />
+          <Property Name="create_time" Type="datetime" />
+          <Property Name="update_time" Type="datetime" />
+          <Property Name="login_count" Type="int" Nullable="false" />
+          <Property Name="login_time" Type="datetime" />
+        </EntityType>
+        <EntityType Name="team">
+          <Key>
+            <PropertyRef Name="teamID" />
+          </Key>
+          <Property Name="teamID" Type="bigint" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="teamName" Type="varchar" MaxLength="50" Nullable="false" />
+          <Property Name="userID" Type="bigint" Nullable="false" />
+          <Property Name="addTime" Type="datetime" />
+          <Property Name="updateTime" Type="datetime" />
+        </EntityType>
+        <EntityType Name="team_user">
+          <Key>
+            <PropertyRef Name="teamUserID" />
+          </Key>
+          <Property Name="teamUserID" Type="bigint" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="teamID" Type="bigint" Nullable="false" />
+          <Property Name="userID" Type="bigint" Nullable="false" />
+          <Property Name="parentID" Type="bigint" />
+          <Property Name="status" Type="int" Nullable="false" />
+          <Property Name="addTime" Type="datetime" />
+          <Property Name="updateTime" Type="datetime" />
+        </EntityType>
+        <!--生成过程中发现错误:
+警告 6002: 表/视图“qds165100622_db.dbo.vyw_billing_log_team”未定义主键。已推断出该键，并将定义创建为只读的表/视图。-->
+        <EntityType Name="vyw_billing_log_team">
+          <Key>
+            <PropertyRef Name="billing_id" />
+            <PropertyRef Name="user_id" />
+            <PropertyRef Name="trade_type" />
+            <PropertyRef Name="participant_user_id" />
+            <PropertyRef Name="money" />
+            <PropertyRef Name="remark" />
+            <PropertyRef Name="is_delete" />
+            <PropertyRef Name="trade_time" />
+            <PropertyRef Name="team_id" />
+            <PropertyRef Name="create_time" />
+            <PropertyRef Name="update_time" />
+            <PropertyRef Name="teamName" />
+            <PropertyRef Name="status" />
+          </Key>
+          <Property Name="billing_id" Type="bigint" Nullable="false" />
+          <Property Name="user_id" Type="bigint" Nullable="false" />
+          <Property Name="trade_type" Type="bit" Nullable="false" />
+          <Property Name="participant_user_id" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="money" Type="money" Nullable="false" />
+          <Property Name="remark" Type="nvarchar" MaxLength="250" Nullable="false" />
+          <Property Name="is_delete" Type="bit" Nullable="false" />
+          <Property Name="trade_user" Type="nvarchar" MaxLength="50" />
+          <Property Name="participant_user_name" Type="nvarchar" MaxLength="250" />
+          <Property Name="trade_time" Type="datetime" Nullable="false" />
+          <Property Name="team_id" Type="bigint" Nullable="false" />
+          <Property Name="create_time" Type="datetime" Nullable="false" />
+          <Property Name="update_time" Type="datetime" Nullable="false" />
+          <Property Name="teamName" Type="varchar" MaxLength="50" Nullable="false" />
+          <Property Name="status" Type="int" Nullable="false" />
+        </EntityType>
+        <!--生成过程中发现错误:
+警告 6002: 表/视图“qds165100622_db.dbo.vyw_notice_user”未定义主键。已推断出该键，并将定义创建为只读的表/视图。-->
+        <EntityType Name="vyw_notice_user">
+          <Key>
+            <PropertyRef Name="notice_id" />
+            <PropertyRef Name="user_id" />
+            <PropertyRef Name="msg" />
+            <PropertyRef Name="type_id" />
+            <PropertyRef Name="is_delete" />
+          </Key>
+          <Property Name="notice_id" Type="bigint" Nullable="false" />
+          <Property Name="user_id" Type="bigint" Nullable="false" />
+          <Property Name="msg" Type="nvarchar" MaxLength="500" Nullable="false" />
+          <Property Name="type_id" Type="int" Nullable="false" />
+          <Property Name="is_delete" Type="bit" Nullable="false" />
+          <Property Name="create_time" Type="datetime" />
+          <Property Name="update_time" Type="datetime" />
+          <Property Name="user_name" Type="nvarchar" MaxLength="20" />
+          <Property Name="user_nickname" Type="nvarchar" MaxLength="20" />
+          <Property Name="user_email" Type="nvarchar" MaxLength="32" />
+          <Property Name="user_face" Type="nvarchar" MaxLength="250" />
+          <Property Name="user_role" Type="int" />
+          <Property Name="billing_id" Type="bigint" />
+        </EntityType>
+        <!--生成过程中发现错误:
+警告 6002: 表/视图“qds165100622_db.dbo.vyw_team_user”未定义主键。已推断出该键，并将定义创建为只读的表/视图。-->
+        <EntityType Name="vyw_team_user">
+          <Key>
+            <PropertyRef Name="teamName" />
+            <PropertyRef Name="teamUserID" />
+            <PropertyRef Name="status" />
+            <PropertyRef Name="login_count" />
+            <PropertyRef Name="userID" />
+            <PropertyRef Name="teamID" />
+          </Key>
+          <Property Name="teamName" Type="varchar" MaxLength="50" Nullable="false" />
+          <Property Name="addTime" Type="datetime" />
+          <Property Name="updateTime" Type="datetime" />
+          <Property Name="teamUserID" Type="bigint" Nullable="false" />
+          <Property Name="parentID" Type="bigint" />
+          <Property Name="status" Type="int" Nullable="false" />
+          <Property Name="user_name" Type="nvarchar" MaxLength="20" />
+          <Property Name="user_nickname" Type="nvarchar" MaxLength="20" />
+          <Property Name="user_email" Type="nvarchar" MaxLength="32" />
+          <Property Name="user_role" Type="int" />
+          <Property Name="user_face" Type="nvarchar" MaxLength="250" />
+          <Property Name="create_time" Type="datetime" />
+          <Property Name="login_count" Type="int" Nullable="false" />
+          <Property Name="login_time" Type="datetime" />
+          <Property Name="userID" Type="bigint" Nullable="false" />
+          <Property Name="teamID" Type="bigint" Nullable="false" />
+          <Property Name="parentName" Type="nvarchar" MaxLength="20" />
+          <Property Name="parentNickName" Type="nvarchar" MaxLength="20" />
+          <Property Name="apply_status" Type="int" />
+        </EntityType>
+        <EntityContainer Name="billing_systemModelStoreContainer">
+          <EntitySet Name="billing_log" EntityType="Self.billing_log" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="sys_notice" EntityType="Self.sys_notice" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="sys_user" EntityType="Self.sys_user" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="team" EntityType="Self.team" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="team_user" EntityType="Self.team_user" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="vyw_billing_log_team" EntityType="Self.vyw_billing_log_team" store:Type="Views" store:Schema="dbo">
+            <DefiningQuery>SELECT 
+[vyw_billing_log_team].[billing_id] AS [billing_id], 
+[vyw_billing_log_team].[user_id] AS [user_id], 
+[vyw_billing_log_team].[trade_type] AS [trade_type], 
+[vyw_billing_log_team].[participant_user_id] AS [participant_user_id], 
+[vyw_billing_log_team].[money] AS [money], 
+[vyw_billing_log_team].[remark] AS [remark], 
+[vyw_billing_log_team].[is_delete] AS [is_delete], 
+[vyw_billing_log_team].[trade_user] AS [trade_user], 
+[vyw_billing_log_team].[participant_user_name] AS [participant_user_name], 
+[vyw_billing_log_team].[trade_time] AS [trade_time], 
+[vyw_billing_log_team].[team_id] AS [team_id], 
+[vyw_billing_log_team].[create_time] AS [create_time], 
+[vyw_billing_log_team].[update_time] AS [update_time], 
+[vyw_billing_log_team].[teamName] AS [teamName], 
+[vyw_billing_log_team].[status] AS [status]
+FROM [dbo].[vyw_billing_log_team] AS [vyw_billing_log_team]</DefiningQuery>
+          </EntitySet>
+          <EntitySet Name="vyw_notice_user" EntityType="Self.vyw_notice_user" store:Type="Views" store:Schema="dbo">
+            <DefiningQuery>SELECT 
+[vyw_notice_user].[notice_id] AS [notice_id], 
+[vyw_notice_user].[user_id] AS [user_id], 
+[vyw_notice_user].[msg] AS [msg], 
+[vyw_notice_user].[type_id] AS [type_id], 
+[vyw_notice_user].[is_delete] AS [is_delete], 
+[vyw_notice_user].[create_time] AS [create_time], 
+[vyw_notice_user].[update_time] AS [update_time], 
+[vyw_notice_user].[user_name] AS [user_name], 
+[vyw_notice_user].[user_nickname] AS [user_nickname], 
+[vyw_notice_user].[user_email] AS [user_email], 
+[vyw_notice_user].[user_face] AS [user_face], 
+[vyw_notice_user].[user_role] AS [user_role], 
+[vyw_notice_user].[billing_id] AS [billing_id]
+FROM [dbo].[vyw_notice_user] AS [vyw_notice_user]</DefiningQuery>
+          </EntitySet>
+          <EntitySet Name="vyw_team_user" EntityType="Self.vyw_team_user" store:Type="Views" store:Schema="dbo">
+            <DefiningQuery>SELECT 
+[vyw_team_user].[teamName] AS [teamName], 
+[vyw_team_user].[addTime] AS [addTime], 
+[vyw_team_user].[updateTime] AS [updateTime], 
+[vyw_team_user].[teamUserID] AS [teamUserID], 
+[vyw_team_user].[parentID] AS [parentID], 
+[vyw_team_user].[status] AS [status], 
+[vyw_team_user].[user_name] AS [user_name], 
+[vyw_team_user].[user_nickname] AS [user_nickname], 
+[vyw_team_user].[user_email] AS [user_email], 
+[vyw_team_user].[user_role] AS [user_role], 
+[vyw_team_user].[user_face] AS [user_face], 
+[vyw_team_user].[create_time] AS [create_time], 
+[vyw_team_user].[login_count] AS [login_count], 
+[vyw_team_user].[login_time] AS [login_time], 
+[vyw_team_user].[userID] AS [userID], 
+[vyw_team_user].[teamID] AS [teamID], 
+[vyw_team_user].[parentName] AS [parentName], 
+[vyw_team_user].[parentNickName] AS [parentNickName], 
+[vyw_team_user].[apply_status] AS [apply_status]
+FROM [dbo].[vyw_team_user] AS [vyw_team_user]</DefiningQuery>
+          </EntitySet>
+        </EntityContainer>
+      </Schema></edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="billing_systemModel" Alias="Self" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2008/09/edm">
+        <EntityContainer Name="billing_systemEntities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="billing_log" EntityType="billing_systemModel.billing_log" />
+          <EntitySet Name="sys_notice" EntityType="billing_systemModel.sys_notice" />
+          <EntitySet Name="sys_user" EntityType="billing_systemModel.sys_user" />
+          <EntitySet Name="team" EntityType="billing_systemModel.team" />
+          <EntitySet Name="team_user" EntityType="billing_systemModel.team_user" />
+          <EntitySet Name="vyw_billing_log_team" EntityType="billing_systemModel.vyw_billing_log_team" />
+          <EntitySet Name="vyw_notice_user" EntityType="billing_systemModel.vyw_notice_user" />
+          <EntitySet Name="vyw_team_user" EntityType="billing_systemModel.vyw_team_user" />
+        </EntityContainer>
+        <EntityType Name="billing_log">
+          <Key>
+            <PropertyRef Name="billing_id" />
+          </Key>
+          <Property Name="billing_id" Type="Int64" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="user_id" Type="Int64" Nullable="false" />
+          <Property Name="trade_type" Type="Boolean" Nullable="false" />
+          <Property Name="participant_user_id" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="money" Type="Decimal" Nullable="false" Precision="19" Scale="4" />
+          <Property Name="remark" Type="String" Nullable="false" MaxLength="250" FixedLength="false" Unicode="true" />
+          <Property Name="is_delete" Type="Boolean" Nullable="false" />
+          <Property Name="trade_user" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="participant_user_name" Type="String" MaxLength="250" FixedLength="false" Unicode="true" />
+          <Property Name="trade_time" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="team_id" Type="Int64" Nullable="false" />
+          <Property Name="create_time" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="update_time" Type="DateTime" Nullable="false" Precision="3" />
+        </EntityType>
+        <EntityType Name="sys_notice">
+          <Key>
+            <PropertyRef Name="notice_id" />
+          </Key>
+          <Property Name="notice_id" Type="Int64" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="user_id" Type="Int64" Nullable="false" />
+          <Property Name="msg" Type="String" Nullable="false" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Name="type_id" Type="Int32" Nullable="false" />
+          <Property Name="is_delete" Type="Boolean" Nullable="false" />
+          <Property Name="billing_id" Type="Int64" />
+          <Property Name="create_time" Type="DateTime" Precision="3" />
+          <Property Name="update_time" Type="DateTime" Precision="3" />
+        </EntityType>
+        <EntityType Name="sys_user">
+          <Key>
+            <PropertyRef Name="user_id" />
+          </Key>
+          <Property Name="user_id" Type="Int64" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="user_name" Type="String" MaxLength="20" FixedLength="false" Unicode="true" />
+          <Property Name="user_nickname" Type="String" MaxLength="20" FixedLength="false" Unicode="true" />
+          <Property Name="user_email" Type="String" MaxLength="32" FixedLength="false" Unicode="true" />
+          <Property Name="user_password" Type="String" MaxLength="32" FixedLength="false" Unicode="true" />
+          <Property Name="user_role" Type="Int32" />
+          <Property Name="user_face" Type="String" MaxLength="250" FixedLength="false" Unicode="true" />
+          <Property Name="apply_status" Type="Int32" />
+          <Property Name="email_token" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="email_token_time" Type="DateTime" Precision="3" />
+          <Property Name="create_time" Type="DateTime" Precision="3" />
+          <Property Name="update_time" Type="DateTime" Precision="3" />
+          <Property Name="login_count" Type="Int32" Nullable="false" />
+          <Property Name="login_time" Type="DateTime" Precision="3" />
+        </EntityType>
+        <EntityType Name="team">
+          <Key>
+            <PropertyRef Name="teamID" />
+          </Key>
+          <Property Name="teamID" Type="Int64" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="teamName" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="userID" Type="Int64" Nullable="false" />
+          <Property Name="addTime" Type="DateTime" Precision="3" />
+          <Property Name="updateTime" Type="DateTime" Precision="3" />
+        </EntityType>
+        <EntityType Name="team_user">
+          <Key>
+            <PropertyRef Name="teamUserID" />
+          </Key>
+          <Property Name="teamUserID" Type="Int64" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="teamID" Type="Int64" Nullable="false" />
+          <Property Name="userID" Type="Int64" Nullable="false" />
+          <Property Name="parentID" Type="Int64" />
+          <Property Name="status" Type="Int32" Nullable="false" />
+          <Property Name="addTime" Type="DateTime" Precision="3" />
+          <Property Name="updateTime" Type="DateTime" Precision="3" />
+        </EntityType>
+        <EntityType Name="vyw_billing_log_team">
+          <Key>
+            <PropertyRef Name="billing_id" />
+            <PropertyRef Name="user_id" />
+            <PropertyRef Name="trade_type" />
+            <PropertyRef Name="participant_user_id" />
+            <PropertyRef Name="money" />
+            <PropertyRef Name="remark" />
+            <PropertyRef Name="is_delete" />
+            <PropertyRef Name="trade_time" />
+            <PropertyRef Name="team_id" />
+            <PropertyRef Name="create_time" />
+            <PropertyRef Name="update_time" />
+            <PropertyRef Name="teamName" />
+            <PropertyRef Name="status" />
+          </Key>
+          <Property Name="billing_id" Type="Int64" Nullable="false" />
+          <Property Name="user_id" Type="Int64" Nullable="false" />
+          <Property Name="trade_type" Type="Boolean" Nullable="false" />
+          <Property Name="participant_user_id" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="money" Type="Decimal" Nullable="false" Precision="19" Scale="4" />
+          <Property Name="remark" Type="String" Nullable="false" MaxLength="250" FixedLength="false" Unicode="true" />
+          <Property Name="is_delete" Type="Boolean" Nullable="false" />
+          <Property Name="trade_user" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="participant_user_name" Type="String" MaxLength="250" FixedLength="false" Unicode="true" />
+          <Property Name="trade_time" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="team_id" Type="Int64" Nullable="false" />
+          <Property Name="create_time" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="update_time" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="teamName" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="status" Type="Int32" Nullable="false" />
+        </EntityType>
+        <EntityType Name="vyw_notice_user">
+          <Key>
+            <PropertyRef Name="notice_id" />
+            <PropertyRef Name="user_id" />
+            <PropertyRef Name="msg" />
+            <PropertyRef Name="type_id" />
+            <PropertyRef Name="is_delete" />
+          </Key>
+          <Property Name="notice_id" Type="Int64" Nullable="false" />
+          <Property Name="user_id" Type="Int64" Nullable="false" />
+          <Property Name="msg" Type="String" Nullable="false" MaxLength="500" FixedLength="false" Unicode="true" />
+          <Property Name="type_id" Type="Int32" Nullable="false" />
+          <Property Name="is_delete" Type="Boolean" Nullable="false" />
+          <Property Name="create_time" Type="DateTime" Precision="3" />
+          <Property Name="update_time" Type="DateTime" Precision="3" />
+          <Property Name="user_name" Type="String" MaxLength="20" FixedLength="false" Unicode="true" />
+          <Property Name="user_nickname" Type="String" MaxLength="20" FixedLength="false" Unicode="true" />
+          <Property Name="user_email" Type="String" MaxLength="32" FixedLength="false" Unicode="true" />
+          <Property Name="user_face" Type="String" MaxLength="250" FixedLength="false" Unicode="true" />
+          <Property Name="user_role" Type="Int32" />
+          <Property Name="billing_id" Type="Int64" />
+        </EntityType>
+        <EntityType Name="vyw_team_user">
+          <Key>
+            <PropertyRef Name="teamName" />
+            <PropertyRef Name="teamUserID" />
+            <PropertyRef Name="status" />
+            <PropertyRef Name="login_count" />
+            <PropertyRef Name="userID" />
+            <PropertyRef Name="teamID" />
+          </Key>
+          <Property Name="teamName" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="addTime" Type="DateTime" Precision="3" />
+          <Property Name="updateTime" Type="DateTime" Precision="3" />
+          <Property Name="teamUserID" Type="Int64" Nullable="false" />
+          <Property Name="parentID" Type="Int64" />
+          <Property Name="status" Type="Int32" Nullable="false" />
+          <Property Name="user_name" Type="String" MaxLength="20" FixedLength="false" Unicode="true" />
+          <Property Name="user_nickname" Type="String" MaxLength="20" FixedLength="false" Unicode="true" />
+          <Property Name="user_email" Type="String" MaxLength="32" FixedLength="false" Unicode="true" />
+          <Property Name="user_role" Type="Int32" />
+          <Property Name="user_face" Type="String" MaxLength="250" FixedLength="false" Unicode="true" />
+          <Property Name="create_time" Type="DateTime" Precision="3" />
+          <Property Name="login_count" Type="Int32" Nullable="false" />
+          <Property Name="login_time" Type="DateTime" Precision="3" />
+          <Property Name="userID" Type="Int64" Nullable="false" />
+          <Property Name="teamID" Type="Int64" Nullable="false" />
+          <Property Name="parentName" Type="String" MaxLength="20" FixedLength="false" Unicode="true" />
+          <Property Name="parentNickName" Type="String" MaxLength="20" FixedLength="false" Unicode="true" />
+          <Property Name="apply_status" Type="Int32" />
+        </EntityType>
+        </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2008/09/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="billing_systemModelStoreContainer" CdmEntityContainer="billing_systemEntities">
+          <EntitySetMapping Name="billing_log">
+            <EntityTypeMapping TypeName="billing_systemModel.billing_log">
+              <MappingFragment StoreEntitySet="billing_log">
+                <ScalarProperty Name="update_time" ColumnName="update_time" />
+                <ScalarProperty Name="create_time" ColumnName="create_time" />
+                <ScalarProperty Name="team_id" ColumnName="team_id" />
+                <ScalarProperty Name="trade_time" ColumnName="trade_time" />
+                <ScalarProperty Name="participant_user_name" ColumnName="participant_user_name" />
+                <ScalarProperty Name="trade_user" ColumnName="trade_user" />
+                <ScalarProperty Name="is_delete" ColumnName="is_delete" />
+                <ScalarProperty Name="remark" ColumnName="remark" />
+                <ScalarProperty Name="money" ColumnName="money" />
+                <ScalarProperty Name="participant_user_id" ColumnName="participant_user_id" />
+                <ScalarProperty Name="trade_type" ColumnName="trade_type" />
+                <ScalarProperty Name="user_id" ColumnName="user_id" />
+                <ScalarProperty Name="billing_id" ColumnName="billing_id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="sys_notice">
+            <EntityTypeMapping TypeName="billing_systemModel.sys_notice">
+              <MappingFragment StoreEntitySet="sys_notice">
+                <ScalarProperty Name="update_time" ColumnName="update_time" />
+                <ScalarProperty Name="create_time" ColumnName="create_time" />
+                <ScalarProperty Name="billing_id" ColumnName="billing_id" />
+                <ScalarProperty Name="is_delete" ColumnName="is_delete" />
+                <ScalarProperty Name="type_id" ColumnName="type_id" />
+                <ScalarProperty Name="msg" ColumnName="msg" />
+                <ScalarProperty Name="user_id" ColumnName="user_id" />
+                <ScalarProperty Name="notice_id" ColumnName="notice_id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="sys_user">
+            <EntityTypeMapping TypeName="billing_systemModel.sys_user">
+              <MappingFragment StoreEntitySet="sys_user">
+                <ScalarProperty Name="login_time" ColumnName="login_time" />
+                <ScalarProperty Name="login_count" ColumnName="login_count" />
+                <ScalarProperty Name="update_time" ColumnName="update_time" />
+                <ScalarProperty Name="create_time" ColumnName="create_time" />
+                <ScalarProperty Name="email_token_time" ColumnName="email_token_time" />
+                <ScalarProperty Name="email_token" ColumnName="email_token" />
+                <ScalarProperty Name="apply_status" ColumnName="apply_status" />
+                <ScalarProperty Name="user_face" ColumnName="user_face" />
+                <ScalarProperty Name="user_role" ColumnName="user_role" />
+                <ScalarProperty Name="user_password" ColumnName="user_password" />
+                <ScalarProperty Name="user_email" ColumnName="user_email" />
+                <ScalarProperty Name="user_nickname" ColumnName="user_nickname" />
+                <ScalarProperty Name="user_name" ColumnName="user_name" />
+                <ScalarProperty Name="user_id" ColumnName="user_id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="team">
+            <EntityTypeMapping TypeName="billing_systemModel.team">
+              <MappingFragment StoreEntitySet="team">
+                <ScalarProperty Name="updateTime" ColumnName="updateTime" />
+                <ScalarProperty Name="addTime" ColumnName="addTime" />
+                <ScalarProperty Name="userID" ColumnName="userID" />
+                <ScalarProperty Name="teamName" ColumnName="teamName" />
+                <ScalarProperty Name="teamID" ColumnName="teamID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="team_user">
+            <EntityTypeMapping TypeName="billing_systemModel.team_user">
+              <MappingFragment StoreEntitySet="team_user">
+                <ScalarProperty Name="updateTime" ColumnName="updateTime" />
+                <ScalarProperty Name="addTime" ColumnName="addTime" />
+                <ScalarProperty Name="status" ColumnName="status" />
+                <ScalarProperty Name="parentID" ColumnName="parentID" />
+                <ScalarProperty Name="userID" ColumnName="userID" />
+                <ScalarProperty Name="teamID" ColumnName="teamID" />
+                <ScalarProperty Name="teamUserID" ColumnName="teamUserID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="vyw_billing_log_team">
+            <EntityTypeMapping TypeName="billing_systemModel.vyw_billing_log_team">
+              <MappingFragment StoreEntitySet="vyw_billing_log_team">
+                <ScalarProperty Name="status" ColumnName="status" />
+                <ScalarProperty Name="teamName" ColumnName="teamName" />
+                <ScalarProperty Name="update_time" ColumnName="update_time" />
+                <ScalarProperty Name="create_time" ColumnName="create_time" />
+                <ScalarProperty Name="team_id" ColumnName="team_id" />
+                <ScalarProperty Name="trade_time" ColumnName="trade_time" />
+                <ScalarProperty Name="participant_user_name" ColumnName="participant_user_name" />
+                <ScalarProperty Name="trade_user" ColumnName="trade_user" />
+                <ScalarProperty Name="is_delete" ColumnName="is_delete" />
+                <ScalarProperty Name="remark" ColumnName="remark" />
+                <ScalarProperty Name="money" ColumnName="money" />
+                <ScalarProperty Name="participant_user_id" ColumnName="participant_user_id" />
+                <ScalarProperty Name="trade_type" ColumnName="trade_type" />
+                <ScalarProperty Name="user_id" ColumnName="user_id" />
+                <ScalarProperty Name="billing_id" ColumnName="billing_id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="vyw_notice_user">
+            <EntityTypeMapping TypeName="billing_systemModel.vyw_notice_user">
+              <MappingFragment StoreEntitySet="vyw_notice_user">
+                <ScalarProperty Name="billing_id" ColumnName="billing_id" />
+                <ScalarProperty Name="user_role" ColumnName="user_role" />
+                <ScalarProperty Name="user_face" ColumnName="user_face" />
+                <ScalarProperty Name="user_email" ColumnName="user_email" />
+                <ScalarProperty Name="user_nickname" ColumnName="user_nickname" />
+                <ScalarProperty Name="user_name" ColumnName="user_name" />
+                <ScalarProperty Name="update_time" ColumnName="update_time" />
+                <ScalarProperty Name="create_time" ColumnName="create_time" />
+                <ScalarProperty Name="is_delete" ColumnName="is_delete" />
+                <ScalarProperty Name="type_id" ColumnName="type_id" />
+                <ScalarProperty Name="msg" ColumnName="msg" />
+                <ScalarProperty Name="user_id" ColumnName="user_id" />
+                <ScalarProperty Name="notice_id" ColumnName="notice_id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="vyw_team_user">
+            <EntityTypeMapping TypeName="billing_systemModel.vyw_team_user">
+              <MappingFragment StoreEntitySet="vyw_team_user">
+                <ScalarProperty Name="apply_status" ColumnName="apply_status" />
+                <ScalarProperty Name="parentNickName" ColumnName="parentNickName" />
+                <ScalarProperty Name="parentName" ColumnName="parentName" />
+                <ScalarProperty Name="teamID" ColumnName="teamID" />
+                <ScalarProperty Name="userID" ColumnName="userID" />
+                <ScalarProperty Name="login_time" ColumnName="login_time" />
+                <ScalarProperty Name="login_count" ColumnName="login_count" />
+                <ScalarProperty Name="create_time" ColumnName="create_time" />
+                <ScalarProperty Name="user_face" ColumnName="user_face" />
+                <ScalarProperty Name="user_role" ColumnName="user_role" />
+                <ScalarProperty Name="user_email" ColumnName="user_email" />
+                <ScalarProperty Name="user_nickname" ColumnName="user_nickname" />
+                <ScalarProperty Name="user_name" ColumnName="user_name" />
+                <ScalarProperty Name="status" ColumnName="status" />
+                <ScalarProperty Name="parentID" ColumnName="parentID" />
+                <ScalarProperty Name="teamUserID" ColumnName="teamUserID" />
+                <ScalarProperty Name="updateTime" ColumnName="updateTime" />
+                <ScalarProperty Name="addTime" ColumnName="addTime" />
+                <ScalarProperty Name="teamName" ColumnName="teamName" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2008/10/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="false" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="true" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="无" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>

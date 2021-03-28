@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="2.0" xmlns:edmx="http://schemas.microsoft.com/ado/2008/10/edmx">
+ <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2008/10/edmx">
+    <!-- Diagram content (shape and connector positions) -->
+    <edmx:Diagrams>
+      <Diagram DiagramId="9425c2691f884ceeb30565ba4524c800" Name="Diagram1">
+        <EntityTypeShape EntityType="billing_systemModel.billing_log" Width="1.5" PointX="0.75" PointY="0.75" />
+        <EntityTypeShape EntityType="billing_systemModel.sys_notice" Width="1.5" PointX="2.75" PointY="0.75" />
+        <EntityTypeShape EntityType="billing_systemModel.sys_user" Width="1.5" PointX="4.75" PointY="0.75" />
+        <EntityTypeShape EntityType="billing_systemModel.team" Width="1.5" PointX="0.75" PointY="5.75" />
+        <EntityTypeShape EntityType="billing_systemModel.team_user" Width="1.5" PointX="2.75" PointY="5.75" />
+        <EntityTypeShape EntityType="billing_systemModel.vyw_billing_log_team" Width="1.5" PointX="4.75" PointY="5.75" />
+        <EntityTypeShape EntityType="billing_systemModel.vyw_notice_user" Width="1.5" PointX="6.75" PointY="0.75" />
+        <EntityTypeShape EntityType="billing_systemModel.vyw_team_user" Width="1.5" PointX="6.75" PointY="5.75" />
+      </Diagram>
+    </edmx:Diagrams>
+  </edmx:Designer>
+</edmx:Edmx>

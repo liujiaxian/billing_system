@@ -1,0 +1,73 @@
+﻿@{
+    ViewBag.Title = "团队添加";
+    Layout = "~/Views/Shared/_LayoutCenterPage.cshtml";
+    Model.team teamModel = ViewData["teamModel"] as Model.team;
+}
+
+@section header{
+    <style type="text/css">
+        .radio {
+            padding-left: 8px;
+        }
+    </style>
+}
+<div class="row">
+    <div class="col-lg-12">
+        <div class="main-box">
+            <header class="main-box-header clearfix">
+                <h2>@(teamModel == null ? "团队添加" : "团队编辑")</h2>
+            </header>
+            <div class="main-box-body clearfix">
+                <div class="form-group">
+                    <label class="control-label" for="txtteamname">团队名称 @teamModel.teamName</label>
+                    <input type="text" class="form-control" id="txtteamname" value="@(teamModel==null?"":teamModel.teamName)">
+                    <span class="help-block"><i class="icon-ok-sign"></i>请输入一个有个性的团队名称</span>
+                </div>
+
+                <button class="btn btn-success" onclick="btn_team_add()">确定添加</button>&nbsp;&nbsp;
+                <button class="btn btn-info" onclick="window.location = '/center/team'">返回列表</button>
+                <br>
+                <br>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+
+
+@section footer{
+    <script src="~/Content/My97DatePicker/WdatePicker.js"></script>
+    <script type="text/javascript">
+        function btn_team_add() {
+            var teamname = $("#txtteamname").val();
+            if (isEmpty(teamname)) {
+                alertErrorMsg("团队名称不能为空！");
+                return;
+            }
+
+
+            if (teamname.trim().length>12) {
+                alertErrorMsg("团队名称不能超过20个字符！");
+                return;
+            }
+
+          
+            var pams = {
+                teamname: teamname
+            };
+
+            Loading("添加中，请稍后...")
+            $.post("/Center/TeamSave", pams, function (data) {
+                LoadClosed();
+                if (data.status == 0) {
+                    alertSuccessMsg(data.msg);
+                    window.location = "/center/team/@Request["page"]";
+                } else {
+                    alertErrorMsg(data.msg);
+                }
+            }, "json");
+        }
+    </script>
+}

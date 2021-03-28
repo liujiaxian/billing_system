@@ -1,0 +1,136 @@
+﻿@{
+    ViewBag.Title = "我的消息";
+    Layout = "~/Views/Shared/_LayoutCenterPage.cshtml";
+}
+
+@section header{
+    @*<link rel="stylesheet" type="text/css" href="/Content/css/libs/dataTables.fixedHeader.css">
+        <link rel="stylesheet" type="text/css" href="/Content/css/libs/dataTables.tableTools.css">*@
+}
+<div class="row">
+    <div class="col-lg-12">
+        <div class="main-box clearfix">
+            <header class="main-box-header clearfix">
+                <h2>
+                    我的消息
+                </h2>
+            </header>
+            <div class="main-box-body clearfix">
+                <div class="table-responsive">
+                    <table id="table-example-fixed" class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th width="8%">编号</th>
+                                <th width="60%">发送内容</th>
+                                <th width="12%">发送时间</th>
+                                <th>账单信息</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @{List<Model.vyw_notice_user> list = ViewData["list"] as List<Model.vyw_notice_user>;}
+                            @if (list != null)
+                            {
+                                foreach (var item in list)
+                                {
+                                    <tr>
+                                        <td>@item.notice_id</td>
+                                        <td>@item.msg</td>
+                                        <td>@Convert.ToDateTime(item.create_time).ToString("yyyy-MM-dd HH:mm:ss") @item.user_role</td>
+                                        <td>
+                                            <a href="/center/billingedit/@item.billing_id" class="table-link" title="点击查看">
+                                                <span class="fa-stack">
+                                                    <i class="fa fa-square fa-stack-2x"></i>
+                                                    <i class="fa fa-eye fa-stack-1x fa-inverse"></i>
+                                                </span>
+                                            </a>
+
+                                            @if ((int)ViewBag.UserRoleId == (int)Utility.Enum_User.超级管理员)
+                                            {
+                                                if (item.type_id == (int)Utility.Enum_Notice_Type.疑问)
+                                                {
+                                                    <a href="javascript:;" class="table-link" title="点击回复" onclick="btnSendMsg(@item.billing_id,@((int)(Utility.Enum_Notice_Type.回复)),@item.user_id)">
+                                                        <span class="fa-stack">
+                                                            <i class="fa fa-square fa-stack-2x"></i>
+                                                            <i class="fa fa-edit fa-stack-1x fa-inverse"></i>
+                                                        </span>
+                                                    </a>
+                                                }
+                                                <a href="javascript:;" class="table-link danger" title="@(item.is_delete == true ? "点击恢复" : "点击删除")" onclick="btn_billing_delete('@item.notice_id','@(item.is_delete==true?"true":"false")')">
+                                                    <span class="fa-stack">
+                                                        <i class="fa fa-square fa-stack-2x"></i>
+                                                        <i class="fa @(item.is_delete == true ? "fa-reply" : "fa-trash-o") fa-stack-1x fa-inverse"></i>
+                                                    </span>
+                                                </a>
+                                            }
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr><td colspan="4">暂无消息记录！</td></tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+                <ul class="pagination pull-right">
+                    @Html.Raw(MyPageBar.PageSortCenter((int)ViewBag.Page, (int)ViewBag.PageCount, ViewBag.Params))
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section footer{
+    @*<script src="/Content/js/jquery.dataTables.js"></script>
+        <script src="/Content/js/dataTables.fixedHeader.js"></script>
+        <script src="/Content/js/dataTables.tableTools.js"></script>
+        <script src="/Content/js/jquery.dataTables.bootstrap.js"></script>*@
+    <script>
+        $(document).ready(function () {
+            //var table = $('#table-example').dataTable({
+            //    'info': false,
+            //    'sDom': 'lTfr<"clearfix">tip',
+            //    'oTableTools': {
+            //        'aButtons': [
+            //            {
+            //                'sExtends': 'collection',
+            //                'sButtonText': '<i class="fa fa-cloud-download"></i>&nbsp;&nbsp;&nbsp;<i class="fa fa-caret-down"></i>',
+            //                'aButtons': ['csv', 'xls', 'pdf', 'copy', 'print']
+            //            }
+            //        ]
+            //    }
+            //});
+
+            //var tt = new $.fn.dataTable.TableTools( table );
+            //$(tt.fnContainer()).insertBefore('div.dataTables_wrapper');
+
+            //var tableFixed = $('#table-example-fixed').dataTable({
+            //    'info': false,
+            //    'pageLength': 20,
+            //    'sDom': 'lTfr<"clearfix">tip',
+
+            //    'oTableTools': {
+            //        'aButtons': [
+            //            {
+            //                'sExtends': 'collection',
+            //                'sButtonText': '<i class="fa fa-cloud-download"></i>&nbsp;&nbsp;&nbsp;<i class="fa fa-caret-down"></i>',
+            //                'aButtons': ['csv', 'xls', 'pdf', 'copy', 'print']
+            //            }
+            //        ]
+            //    }
+            //});
+
+            //new $.fn.dataTable.FixedHeader(tableFixed);
+
+            //var tt = new $.fn.dataTable.TableTools(tableFixed);
+            //$(tt.fnContainer()).insertBefore('div.dataTables_wrapper');
+        });
+
+
+        function btn_billing_delete(id, isdelete) {
+            btn_delete("/Center/MyNoticeDelete", id, isdelete);
+        }
+    </script>
+}

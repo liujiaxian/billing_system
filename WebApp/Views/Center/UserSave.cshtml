@@ -1,0 +1,115 @@
+﻿@{
+    ViewBag.Title = "用户添加";
+    Layout = "~/Views/Shared/_LayoutCenterPage.cshtml";
+    Model.sys_user userModel = ViewData["user"] as Model.sys_user;
+}
+
+
+@section header{
+    <style type="text/css">
+        .radio {
+            padding-left: 8px;
+        }
+    </style>
+        <!-- 此段必须要引入 t为小时级别的时间戳 -->
+<link type="text/css" href="//g.alicdn.com/sd/ncpc/nc.css" rel="stylesheet" />
+<script type="text/javascript" src="//g.alicdn.com/sd/ncpc/nc.js"></script>
+<!-- 引入结束 -->
+}
+<div class="row">
+    <div class="col-lg-12">
+        <div class="main-box">
+            <header class="main-box-header clearfix">
+                <h2>用户添加</h2>
+            </header>
+            <div class="main-box-body clearfix">
+                <div class="form-group">
+                    <label class="control-label" for="txtUserName">登录账号</label>
+                    <input type="text" class="form-control" id="txtUserName" value="@userModel.user_name">
+                    <span class="help-block"><i class="icon-ok-sign"></i>用户登录的账号</span>
+                </div>
+                <div class="form-group">
+                    <label class="control-label" for="txtEmail">邮箱地址</label>
+                    <input type="text" class="form-control" id="txtEmail" value="@userModel.user_email">
+                    <span class="help-block"><i class="icon-ok-sign"></i>用户找回密码</span>
+                </div>
+                <div class="form-group">
+                    <label class="control-label" for="txtPwd">登录密码</label>
+                    <input type="password" class="form-control" id="txtPwd">
+                    <span class="help-block"><i class="icon-ok-sign"></i>@(userModel==null?"":"不输入不修改密码")</span>
+                </div>
+                <button class="btn btn-success" onclick="btn_user_save()">确定保存</button>&nbsp;&nbsp;
+                <button class="btn btn-info" onclick="window.location = '/center/userlist'">返回列表</button>
+                <br>
+                <br>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+ <!-- 此段必须要引入 -->
+<div id="_umfp" style="display: inline; width: 1px; height: 1px; overflow: hidden"></div>
+<!-- 引入结束 -->
+
+
+@section footer{
+<script src="/Content/js/md5.js"></script>
+  <script type="text/javascript">
+    function btn_user_save() {
+        var name = $("#txtUserName").val();
+        if (isEmpty(name)) {
+            alertErrorMsg("登录账号不能为空！");
+            return;
+        }
+        if (!checkUser(name)) {
+            alertErrorMsg("登录账号格式不正确！正确格式\"abcd12\"");
+            return;
+        }
+        var email = $("#txtEmail").val();
+        if (isEmpty(email)) {
+            alertErrorMsg("邮箱地址不能为空，可用于登录或找回密码！");
+            return;
+        }
+
+        if (!CheckMail(email)) {
+            alertErrorMsg("邮箱地址格式不正确！");
+            return;
+        }
+
+        var pwd = $("#txtPwd").val();
+        var userID = "@userModel.user_id";
+        if (!userID) {
+            if (isEmpty(pwd)) {
+                alertErrorMsg("登录密码不能为空！");
+                return;
+            }
+            if (pwd.trim().length < 6) {
+                alertErrorMsg("登录密码不能小于6个字符！");
+                return;
+            }
+        }
+
+        var pams = {
+            name: name,
+            email: email,
+            pwd: !pwd?null:hex_md5(pwd),
+            userID:"@userModel.user_id"
+
+        };
+
+        Loading("添加中，请稍后...")
+        $.post("/Center/UserSave", pams, function (data) {
+            LoadClosed();
+            if (data.status == 0) {
+                alertSuccessMsg(data.msg);
+                window.location = "/center/userlist";
+            } else {
+                alertErrorMsg(data.msg);
+            }
+        }, "json");
+    }
+</script>
+
+
+}

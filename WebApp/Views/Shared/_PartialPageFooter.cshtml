@@ -1,0 +1,223 @@
+﻿<div id="config-tool" class="closed">
+    <a id="config-tool-cog">
+        <i class="fa fa-cog"></i>
+    </a>
+    <div id="config-tool-options">
+        <h4>模板风格</h4>
+        <ul>
+            <li>
+                <div class="checkbox-nice">
+                    <input type="checkbox" id="config-fixed-header" />
+                    <label for="config-fixed-header">
+                        固定头部
+                    </label>
+                </div>
+            </li>
+            <li>
+                <div class="checkbox-nice">
+                    <input type="checkbox" id="config-fixed-sidebar" />
+                    <label for="config-fixed-sidebar">
+                        固定左边导航
+                    </label>
+                </div>
+            </li>
+            <li>
+                <div class="checkbox-nice">
+                    <input type="checkbox" id="config-fixed-footer" />
+                    <label for="config-fixed-footer">
+                        固定底部
+                    </label>
+                </div>
+            </li>
+            <li>
+                <div class="checkbox-nice">
+                    <input type="checkbox" id="config-boxed-layout" />
+                    <label for="config-boxed-layout">
+                        盒装布局
+                    </label>
+                </div>
+            </li>
+            <li>
+                <div class="checkbox-nice">
+                    <input type="checkbox" id="config-rtl-layout" />
+                    <label for="config-rtl-layout">
+                        右到左
+                    </label>
+                </div>
+            </li>
+        </ul>
+        <br />
+        <h4>皮肤颜色</h4>
+        <ul id="skin-colors" class="clearfix">
+            <li>
+                <a class="skin-changer" data-skin="" data-toggle="tooltip" title="Default"
+                   style="background-color: #34495e;"></a>
+            </li>
+            <li>
+                <a class="skin-changer" data-skin="theme-white" data-toggle="tooltip" title="White/Green"
+                   style="background-color: #2ecc71;"></a>
+            </li>
+            <li>
+                <a class="skin-changer blue-gradient" data-skin="theme-blue-gradient" data-toggle="tooltip"
+                   title="Gradient"></a>
+            </li>
+            <li>
+                <a class="skin-changer" data-skin="theme-turquoise" data-toggle="tooltip" title="Green Sea"
+                   style="background-color: #1abc9c;"></a>
+            </li>
+            <li>
+                <a class="skin-changer" data-skin="theme-amethyst" data-toggle="tooltip" title="Amethyst"
+                   style="background-color: #9b59b6;"></a>
+            </li>
+            <li>
+                <a class="skin-changer" data-skin="theme-blue" data-toggle="tooltip" title="Blue"
+                   style="background-color: #2980b9;"></a>
+            </li>
+            <li>
+                <a class="skin-changer" data-skin="theme-red" data-toggle="tooltip" title="Red"
+                   style="background-color: #e74c3c;"></a>
+            </li>
+            <li>
+                <a class="skin-changer" data-skin="theme-whbl" data-toggle="tooltip" title="White/Blue"
+                   style="background-color: #3498db;"></a>
+            </li>
+        </ul>
+    </div>
+</div>
+
+<div class="md-overlay"></div>
+
+<script src="/Content/js/demo-skin-changer.js"></script>
+<script src="/Content/js/jquery.js"></script>
+<script src="/Content/js/bootstrap.js"></script>
+<script src="/Content/js/jquery.nanoscroller.min.js"></script>
+<script src="/Content/js/demo.js"></script>
+
+<script src="/Content/js/modernizr.custom.js"></script>
+<script src="/Content/js/classie.js"></script>
+<script src="/Content/js/notificationFx.js"></script>
+
+<script src="/Content/js/scripts.js"></script>
+@*<script src="/Content/js/pace.min.js"></script>*@
+<script src="~/Content/layer/layer.js"></script>
+
+<script type="text/javascript">
+    var notification;
+    function alertSuccessMsg(msg) {
+        if (notification != undefined && notification.active == true) {
+            notification.dismiss();
+        }
+        // create the notification
+        notification = new NotificationFx({
+            message: '<span class="icon fa fa-bullhorn fa-2x"></span><p>' + msg + '</p>',
+            layout: 'bar',
+            effect: 'slidetop',
+            type: 'success', // notice, warning or error
+            onClose: function () {
+            }
+        });
+
+        // show the notification
+        notification.show();
+    }
+
+    function alertErrorMsg(msg) {
+        if (notification != undefined && notification.active == true) {
+            notification.dismiss();
+        }
+        // create the notification
+        notification = new NotificationFx({
+            message: '<span class="icon fa fa-bullhorn fa-2x"></span><p>' + msg + '</p>',
+            layout: 'bar',
+            effect: 'slidetop',
+            type: 'error', // notice, warning or error
+            onClose: function () {
+            }
+        });
+
+        // show the notification
+        notification.show();
+    }
+
+    function Loading(msg) {
+        layer.load(2);
+    }
+
+
+
+    //function Loading(msg) {
+    //    // create the notification
+    //    notification = new NotificationFx({
+    //        message: '<span class="icon fa fa-bullhorn fa-2x"></span><p>' + msg + '</p>',
+    //        layout: 'bar',
+    //        effect: 'exploader',
+    //        type: 'notice', // notice, warning or error
+    //        onClose: function () {
+    //        }
+    //    });
+    //    // show the notification
+    //    notification.show();
+    //}
+
+    function LoadClosed() {
+        layer.closeAll();
+    }
+
+
+    function isEmpty(val) {
+        if (val == "" || val == null || val == undefined) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+
+    //校验邮箱地址
+    function CheckMail(mail) {
+        var filter = /^([a-zA-Z0-9_\.\-])+\@@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
+        if (filter.test(mail)) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+    //校验固话号码
+    function checkPhone(str) {
+        var re = /^0\d{2,3}-?\d{7,8}$/;
+        if (re.test(str)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+    //校验手机号码
+    function checkMobile(str) {
+        var re = /^1\d{10}$/
+        if (re.test(str)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+    //校验登录账号
+    function checkUser(str) {
+        var re = /^[a-zA-z]\w{5,15}$/;
+        if (re.test(str)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    //检验金额
+    function checkMoney(str) {
+        var pt = /^(-)?(([1-9]{1}\d*)|([0]{1}))(\.(\d){1,2})?$/;
+        if (pt.test(str)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+</script>

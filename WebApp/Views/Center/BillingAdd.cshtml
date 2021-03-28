@@ -1,0 +1,180 @@
+﻿@{
+    ViewBag.Title = "账单添加";
+    Layout = "~/Views/Shared/_LayoutCenterPage.cshtml";
+    List<Model.vyw_team_user> teamlist = ViewData["teamlist"] as List<Model.vyw_team_user>;
+}
+
+
+@section header{
+    <style type="text/css">
+        .radio {
+            padding-left: 8px;
+        }
+    </style>
+}
+<div class="row">
+    <div class="col-lg-12">
+        <div class="main-box">
+            <header class="main-box-header clearfix">
+                <h2>账单记录添加</h2>
+            </header>
+            <div class="main-box-body clearfix">
+                <div class="form-group">
+                    <label>所属团队</label>
+                    <input type="text" class="form-control" readonly="readonly" value="@ViewBag.TeamName">
+                </div>
+                <div class="form-group">
+                    <label>账单类型</label>
+                    <div class="radio">
+                        <input type="radio" name="optionsRadios" id="optionsRadios1" value="true" checked="">
+                        <label for="optionsRadios1">
+                            支出
+                        </label>
+                    </div>
+                    <div class="radio">
+                        <input type="radio" name="optionsRadios" id="optionsRadios2" value="false">
+                        <label for="optionsRadios2">
+                            收入
+                        </label>
+                    </div>
+                </div>
+                @{List<Model.vyw_team_user> userlist = ViewData["userlist"] as List<Model.vyw_team_user>;}
+                <div class="form-group">
+                    <label>交易用户</label>
+                    <select class="form-control" id="txttradeuser">
+                        @if (userlist.Count > 0)
+                        {
+                            foreach (var item in userlist)
+                            {
+                                if (item.userID == (long)(ViewBag.UserID))
+                                {
+                                    <option selected value="@item.userID">@item.user_nickname</option>
+                                }
+                                else
+                                {
+                                    <option value="@item.userID">@item.user_nickname</option>
+                                }
+                            }
+                        }
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>参与人员</label>
+                    <br>
+                    @if (userlist.Count > 0)
+                    {
+                        foreach (var item in userlist)
+                        {
+                            <div class="checkbox-nice checkbox-inline">
+                                <input type="checkbox" id="checkbox-inl-@item.userID" value="@item.userID" data-name="@item.user_nickname">
+                                <label for="checkbox-inl-@item.userID">
+                                    @item.user_nickname
+                                </label>
+                            </div>
+                        }
+                    }
+                </div>
+
+                <div class="form-group">
+                    <label class="control-label" for="inputSuccess">交易金额</label>
+                    <input type="text" class="form-control" id="txttrademoney">
+                    <span class="help-block"><i class="icon-ok-sign"></i>不需要输入正负数，格式12.05</span>
+                </div>
+
+                <div class="form-group">
+                    <label for="txtbillingdetail">账单详细</label>
+                    <textarea class="form-control" id="txtbillingdetail" rows="5" placeholder="支出或收入的说明"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label class="control-label" for="txtbillingtime">交易时间</label>
+                    <input type="text" class="form-control" id="txtbillingtime" onfocus="WdatePicker({ dateFmt: 'yyyy-MM-dd HH:mm:ss' })" readonly="readonly">
+                </div>
+
+                <button class="btn btn-success" onclick="btn_billing_add()">确定添加</button>&nbsp;&nbsp;
+                <button class="btn btn-info" onclick="window.location = '/center/billing?teamid=@Request["teamid"]'">返回列表</button>
+                <br>
+                <br>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+
+
+@section footer{
+    <script src="~/Content/My97DatePicker/WdatePicker.js"></script>
+    <script type="text/javascript">
+        function btn_billing_add() {
+            var teamid = "@Request["teamid"]";
+            if (!teamid)
+            {
+                alertErrorMsg("请选择团队,如果没有团队请先创建团队！");
+                return;
+            }
+            var type = $("input[name=optionsRadios]:checked").val();
+
+            var tradeuser = $("#txttradeuser option:selected").text();
+            var tradeuserid = $("#txttradeuser").val();
+
+            var participant = new Array();
+            var participant_name = new Array();
+            $("input[type=checkbox]").each(function () {
+                if ($(this).prop("checked")) {
+                    participant.push($(this).val());
+                    participant_name.push($(this).attr("data-name"));
+                }
+            });
+
+            if (isEmpty(participant)) {
+                alertErrorMsg("请选择参与人员！");
+                return;
+            }
+
+            var trademoney = $("#txttrademoney").val();
+            if (isEmpty(trademoney)) {
+                alertErrorMsg("交易金额不能为空！");
+                return;
+            }
+
+
+            if (!checkMoney(trademoney)) {
+                alertErrorMsg("金额格式不正确！");
+                return;
+            }
+
+            var billingdetail = $("#txtbillingdetail").val();
+
+            var billingtime = $("#txtbillingtime").val();
+            if (isEmpty(billingtime)) {
+                alertErrorMsg("交易时间不能为空！");
+                return;
+            }
+
+            var pams = {
+                type: type,
+                participant: participant.toString(),
+                trademoney: trademoney,
+                tradedetail: billingdetail,
+                tradetime: billingtime,
+                tradeuser: tradeuser,
+                tradeuserid: tradeuserid,
+                teamid:teamid,
+                participant_name: participant_name.toString()
+            };
+
+            Loading("添加中，请稍后...")
+            $.post("/Center/BillingAdd", pams, function (data) {
+                LoadClosed();
+                if (data.status == 0) {
+                    alertSuccessMsg(data.msg);
+                    window.location = "/center/billing?teamid=@Request["teamid"]&page=@Request["page"]";
+                } else {
+                    alertErrorMsg(data.msg);
+                }
+            }, "json");
+        }
+    </script>
+}

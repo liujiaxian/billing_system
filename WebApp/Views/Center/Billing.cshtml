@@ -1,0 +1,184 @@
+﻿@{
+    ViewBag.Title = "账单记录";
+    Layout = "~/Views/Shared/_LayoutCenterPage.cshtml";
+    List<Model.team> teamList = ViewData["teamList"] as List<Model.team>;
+}
+
+@section header{
+    @*<link rel="stylesheet" type="text/css" href="/Content/css/libs/dataTables.fixedHeader.css">
+        <link rel="stylesheet" type="text/css" href="/Content/css/libs/dataTables.tableTools.css">*@
+    <script src="~/Content/My97DatePicker/WdatePicker.js"></script>
+}
+<div class="row">
+    <div class="col-lg-12">
+        <div class="main-box clearfix">
+            <header class="main-box-header clearfix">
+                <h2 class="pull-left">
+                    最新账单&nbsp;
+                    <a href="/center/billingadd?teamid=@Request["teamid"].ToInt32()&page=@Html.ViewContext.RouteData.Values["id"]" class="table-link" title="点击添加">
+                        <span class="fa-stack">
+                            <i class="fa fa-square fa-stack-2x"></i>
+                            <i class="fa fa-plus fa-stack-1x fa-inverse"></i>
+                        </span>
+                    </a>
+                    <a href="/center/calculation?teamid=@Request["teamid"].ToInt32()" class="table-link" title="点击结算">
+                        <span class="fa-stack">
+                            <i class="fa fa-square fa-stack-2x"></i>
+                            <i class="fa fa-money fa-stack-1x fa-inverse"></i>
+                        </span>
+                    </a>
+                </h2>
+                <form class="form-inline pull-left" role="form" style="margin-left:50px;" action="">
+                    <input type="hidden" class="form-control" name="teamid" value="@Request["teamid"]">
+                    <div class="form-group">
+                        <input type="text" class="form-control" name="tuser" placeholder="交易用户" value="@Request["tuser"]">
+                    </div>
+                    <div class="form-group">
+                        <input type="text" class="form-control" name="puser" placeholder="参与用户" value="@Request["puser"]">
+                    </div>
+                    <div class="form-group">
+                        <input type="text" class="form-control" name="remark" placeholder="交易详细" value="@Request["remark"]">
+                    </div>
+                    <input type="hidden" name="userid" value="@Request["userid"]" />
+                    <div class="form-group">
+                        <input type="text" class="form-control Wdate" name="stime" id="txtstarttime" placeholder="交易时间开始" onfocus="WdatePicker({ dateFmt: 'yyyy-MM-dd' })" style="height:34px;" value="@Request["stime"]"> -
+                        <input type="text" class="form-control Wdate" name="etime" placeholder="交易时间结束" onfocus="WdatePicker({ minDate: '#F{$dp.$D(\'txtstarttime\')}', dateFmt: 'yyyy-MM-dd' })" style="height:34px;" value="@Request["etime"]">
+                    </div>
+                    <button type="submit" class="btn btn-success"><span class="fa fa-search"></span>&nbsp;搜索</button>
+                </form>
+
+            </header>
+            <div class="main-box-body clearfix">
+                <div class="table-responsive">
+                    <table id="table-example-fixed" class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th width="8%">编号</th>
+                                <th width="8%">交易用户</th>
+                                <th width="15%">参与用户</th>
+                                <th width="8%">交易金额</th>
+                                <th>交易详细</th>
+                                <th width="8%">所属团队</th>
+                                <th width="12%">交易时间</th>
+                                <th width="12%">添加时间</th>
+                                <th width="8%">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @{List<Model.vyw_billing_log_team> list = ViewData["list"] as List<Model.vyw_billing_log_team>;}
+                            @if (list != null)
+                            {
+                                foreach (var item in list)
+                                {
+                                    <tr>
+                                        <td>@((list.IndexOf(item) + 1) + ((ViewBag.Page - 1) * ViewBag.PageSize))</td>
+                                        <td>@item.trade_user</td>
+                                        <td>@item.participant_user_name</td>
+                                        <td><span class="label label-warning">￥@Convert.ToDecimal(item.money).ToString("0.00") </span></td>
+                                        <td>@item.remark</td>
+                                        <td><span class="label label-primary">@item.teamName</span></td>
+                                        <td>@Convert.ToDateTime(item.trade_time).ToString("yyyy-MM-dd HH:mm:ss")</td>
+                                        <td>@Convert.ToDateTime(item.create_time).ToString("yyyy-MM-dd HH:mm:ss")</td>
+
+                                        <td>
+                                            @if (Convert.ToInt32(ViewBag.UserId) == item.user_id || Convert.ToInt32(ViewBag.UserRoleId) == (int)Utility.Enum_User.超级管理员)
+                                            {
+                                                <a href="/center/billingedit/@item.billing_id?page=@Html.ViewContext.RouteData.Values["id"]" class="table-link" title="点击编辑">
+                                                    <span class="fa-stack">
+                                                        <i class="fa fa-square fa-stack-2x"></i>
+                                                        <i class="fa fa-pencil fa-stack-1x fa-inverse"></i>
+                                                    </span>
+                                                </a>
+                                                <a href="javascript:;" class="table-link danger" title="@(item.is_delete == true ? "点击恢复" : "点击删除")" onclick="btn_billing_delete('@item.billing_id','@(item.is_delete==true?"true":"false")')">
+                                                    <span class="fa-stack">
+                                                        <i class="fa fa-square fa-stack-2x"></i>
+                                                        <i class="fa @(item.is_delete == true ? "fa-reply" : "fa-trash-o") fa-stack-1x fa-inverse"></i>
+                                                    </span>
+                                                </a>
+                                            }
+                                            else if (Convert.ToInt32(ViewBag.UserRoleId) != (int)Utility.Enum_User.超级管理员)
+                                            {
+                                                <a href="javascript:;" onclick="btnSendMsg(@item.billing_id,@((int)Utility.Enum_Notice_Type.疑问),0)" class="table-link" title="点击发送疑问信息给管理员">
+                                                    <span class="fa-stack">
+                                                        <i class="fa fa-square fa-stack-2x"></i>
+                                                        <i class="fa fa-question-circle fa-stack-1x fa-inverse"></i>
+                                                    </span>
+                                                </a>
+                                            }
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr><td colspan="8">暂无账单记录！</td></tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+                <ul class="pagination pull-right">
+                    @Html.Raw(MyPageBar.PageSortCenter((int)ViewBag.Page, (int)ViewBag.PageCount, ViewBag.Params))
+                </ul>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+
+
+
+
+@section footer{
+    @*<script src="/Content/js/jquery.dataTables.js"></script>
+        <script src="/Content/js/dataTables.fixedHeader.js"></script>
+        <script src="/Content/js/dataTables.tableTools.js"></script>
+        <script src="/Content/js/jquery.dataTables.bootstrap.js"></script>*@
+    <script>
+        $(document).ready(function () {
+            //var table = $('#table-example').dataTable({
+            //    'info': false,
+            //    'sDom': 'lTfr<"clearfix">tip',
+            //    'oTableTools': {
+            //        'aButtons': [
+            //            {
+            //                'sExtends': 'collection',
+            //                'sButtonText': '<i class="fa fa-cloud-download"></i>&nbsp;&nbsp;&nbsp;<i class="fa fa-caret-down"></i>',
+            //                'aButtons': ['csv', 'xls', 'pdf', 'copy', 'print']
+            //            }
+            //        ]
+            //    }
+            //});
+
+            //var tt = new $.fn.dataTable.TableTools( table );
+            //$(tt.fnContainer()).insertBefore('div.dataTables_wrapper');
+
+            //var tableFixed = $('#table-example-fixed').dataTable({
+            //    'info': false,
+            //    'pageLength': 20,
+            //    'sDom': 'lTfr<"clearfix">tip',
+
+            //    'oTableTools': {
+            //        'aButtons': [
+            //            {
+            //                'sExtends': 'collection',
+            //                'sButtonText': '<i class="fa fa-cloud-download"></i>&nbsp;&nbsp;&nbsp;<i class="fa fa-caret-down"></i>',
+            //                'aButtons': ['csv', 'xls', 'pdf', 'copy', 'print']
+            //            }
+            //        ]
+            //    }
+            //});
+
+            //new $.fn.dataTable.FixedHeader(tableFixed);
+
+            //var tt = new $.fn.dataTable.TableTools(tableFixed);
+            //$(tt.fnContainer()).insertBefore('div.dataTables_wrapper');
+        });
+
+
+        function btn_billing_delete(id, isdelete) {
+            btn_delete("/Center/BillingDelete", id, isdelete);
+        }
+    </script>
+}

@@ -1,0 +1,122 @@
+﻿@{
+    ViewBag.Title = "注册";
+    Layout = "~/Views/Shared/_LayoutAccountPage.cshtml";
+}
+
+<header id="login-header">
+    <div id="login-logo">
+        <a href="">
+            <img src="/Content/img/logo.png" alt="" /></a>
+    </div>
+</header>
+<div id="login-box-inner">
+    <div role="form">
+        <div class="input-group">
+            <span class="input-group-addon"><i class="fa fa-user"></i></span>
+            <input class="form-control" type="text" placeholder="登录账号" id="txtloginid">
+        </div>
+        <div class="input-group">
+            <span class="input-group-addon"><i class="fa fa-envelope"></i></span>
+            <input class="form-control" type="text" placeholder="邮箱地址" id="txtemail">
+        </div>
+        <div class="input-group">
+            <span class="input-group-addon"><i class="fa fa-lock"></i></span>
+            <input type="password" class="form-control" placeholder="密码" id="txtpwd">
+        </div>
+        <div class="input-group">
+            <span class="input-group-addon"><i class="fa fa-unlock-alt"></i></span>
+            <input type="password" class="form-control" placeholder="确认密码" id="txtrepwd">
+        </div>
+        <div id="remember-me-wrapper">
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="checkbox-nice">
+                        <input type="checkbox" id="terms-cond" checked="checked" />
+                        <label for="terms-cond">
+                            同意网站协议！
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-12">
+                <button class="btn btn-success col-xs-12" onclick="btn_register()">注册</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="login-box-footer">
+    <div class="row">
+        <div class="col-xs-12">
+            已有账号吗?
+      <a href="/account/login">立即登录
+      </a>
+        </div>
+    </div>
+</div>
+
+@section footer{
+    <script type="text/javascript">
+        function btn_register() {
+            var name = $("#txtloginid").val();
+            if (isEmpty(name)) {
+                alertErrorMsg("登录账号不能为空！");
+                return;
+            }
+            if (!checkUser(name)) {
+                alertErrorMsg("登录账号格式不正确！正确格式\"abcd12\"");
+                return;
+            }
+            var email = $("#txtemail").val();
+            if (isEmpty(email)) {
+                alertErrorMsg("邮箱地址不能为空，可用于登录或找回密码！");
+                return;
+            }
+
+            if (!CheckMail(email)) {
+                alertErrorMsg("邮箱地址格式不正确！");
+                return;
+            }
+
+            var pwd = $("#txtpwd").val();
+            if (isEmpty(pwd)) {
+                alertErrorMsg("登录密码不能为空！");
+                return;
+            }
+            if (pwd.trim().length < 6) {
+                alertErrorMsg("登录密码不能小于6个字符！");
+                return;
+            }
+            var repwd = $("#txtrepwd").val();
+            if (pwd.trim()!=repwd.trim()) {
+                alertErrorMsg("确认密码与密码不一致！");
+                return;
+            }
+
+            var ischeck = $("#terms-cond").prop("checked");
+            if (!ischeck) {
+                alertErrorMsg("请同意网站协议！");
+                return;
+            }
+
+            var pams = {
+                name: name,
+                email: email,
+                pwd: hex_md5(pwd),
+                repwd: hex_md5(repwd)
+            };
+
+            Loading("注册中，请稍后...")
+            $.post("/Account/Register", pams, function (data) {
+                LoadClosed();
+                if (data.status == 0) {
+                    alertSuccessMsg(data.msg);                    
+                } else {
+                    alertErrorMsg(data.msg);
+                }
+            },"json");
+        }
+    </script>
+      
+}

@@ -1,0 +1,189 @@
+﻿@{
+    ViewBag.Title = "我的信息";
+    Layout = "~/Views/Shared/_LayoutCenterPage.cshtml";
+    Model.sys_user usermodel = ViewData["userinfo"] as Model.sys_user;
+}
+
+
+@section header{
+<link href="~/Content/webuploader/webuploader.css" rel="stylesheet" />
+    <style type="text/css">
+        .radio {
+            padding-left: 8px;
+        }
+    </style>
+}
+<div class="row" id="user-profile">
+    <div class="col-lg-3 col-md-4 col-sm-4">
+        <div class="main-box clearfix">
+            <header class="main-box-header clearfix">
+                <h2>@usermodel.user_name</h2>
+            </header>
+            <div class="main-box-body clearfix" style="padding-bottom: 26px;">
+                <div class="profile-status">
+                    <i class="fa fa-circle"></i> 已登录 @usermodel.login_count 次
+                </div>
+                <img src="@usermodel.user_face" alt="@usermodel.user_nickname"
+                     class="profile-img img-responsive center-block imageSrc" />
+                <div class="profile-label">
+                    <span class="label label-danger">@Enum.GetName(typeof(Utility.Enum_User), usermodel.user_role)</span>
+                </div>
+                <div class="profile-stars">
+                    @for (int i = 0; i < 5; i++)
+                    {
+                        if (i < (int)ViewBag.StarCount)
+                        {
+                            <i class="fa fa-star"></i>
+                        }
+                        else
+                        {
+                            <i class="fa fa-star-o"></i>
+                        }
+                    }
+                    <span>活跃度</span>
+                </div>
+                <div class="profile-since">
+                    注册时间: @Convert.ToDateTime(usermodel.create_time).ToString("yyyy-MM-dd HH:mm:ss")
+                </div>
+                <div class="profile-details">
+                    <ul class="fa-ul">
+                        <li><i class="fa-li fa fa-truck"></i>交易数: <span>@ViewBag.TradeCount</span></li>
+                        <li><i class="fa-li fa fa-comment"></i>参与数: <span>@ViewBag.ParticipantCount</span></li>
+                        <li><i class="fa-li fa fa-tasks"></i>交易额: <span>￥@ViewBag.TradeMoney</span></li>
+                    </ul>
+                </div>
+                <div class="profile-message-btn center-block text-center">
+                    <button class="btn btn-success md-trigger" data-modal="modal-13" onclick="window.location='/center/updatepwd'">
+                        <i class="fa fa-edit"></i>
+                        修改密码
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-9 col-md-8 col-sm-8">
+        <div class="main-box clearfix">
+            <header class="main-box-header clearfix">
+                <h2>更新我的信息</h2>
+            </header>
+            <div class="main-box-body clearfix">
+
+                <div class="form-group">
+                    <label>我的角色</label>
+                    <div class="radio">
+                        <input type="radio" id="optionsRadios" value="true" checked="" disabled>
+                        <label for="optionsRadios">
+                            @Enum.GetName(typeof(Utility.Enum_User), usermodel.user_role)
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>我的状态</label>
+                    <select class="form-control" id="txttradeuser" disabled>
+                        <option>@Enum.GetName(typeof(Utility.Enum_Member_Status), usermodel.apply_status)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>我的头像</label>
+                    <div style="margin-bottom:5px;">
+                        <input type="hidden" id="imageUrl" />
+                        <img src="@(usermodel.user_face == null ? "/Content/img/samples/scarlet-159.png" : usermodel.user_face)" style="border-radius:50%;width:100px;height:100px;" class="imageSrc" />
+                    </div>
+                    <div id="filePicker">上传头像</div>
+                </div>
+
+                <div class="form-group">
+                    <label class="control-label" for="txtusername">登录账户</label>
+                    <input type="text" class="form-control" id="txtusername" placeholder="输入你常用的用户名称" value="@usermodel.user_name">
+                    <span class="help-block"><i class="icon-ok-sign"></i>用于系统登录(不小于5位，由英文和数字组成)</span>
+                </div>
+
+                <div class="form-group">
+                    <label class="control-label" for="txtemail">我的邮箱</label>
+                    <input type="text" class="form-control" id="txtemail" placeholder="输入常用的邮箱地址" value="@usermodel.user_email">
+                    <span class="help-block"><i class="icon-ok-sign"></i>用于密码找回</span>
+                </div>
+
+
+                <div class="form-group">
+                    <label class="control-label" for="txtnickname">真实姓名</label>
+                    <input type="text" class="form-control" id="txtnickname" placeholder="输入您的真实姓名" value="@usermodel.user_nickname" maxlength="10">
+                    <span class="help-block"><i class="icon-ok-sign"></i>不超过10个字符</span>
+                </div>
+
+                <div class="form-group">
+                    <label class="control-label" for="txtlogintime">最近登录时间</label>
+                    <input type="text" class="form-control" id="txtlogintime" disabled value="@Convert.ToDateTime(usermodel.login_time).ToString("yyyy-MM-dd HH:mm:ss")">
+                </div>
+
+                <button class="btn btn-success" onclick="btn_user_update()">确定更新</button>
+                <br>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+@section footer{
+<script src="~/Content/webuploader/webuploader.min.js"></script>
+<script src="~/Content/webuploader/image_upload.js"></script>
+    <script type="text/javascript">
+        function btn_user_update() {
+            var userface = $("#imageUrl").val();
+            if (isEmpty(userface)) {
+                alertErrorMsg("请上传头像！");
+                return;
+            }
+
+            var username = $("#txtusername").val();
+            if (isEmpty(username)) {
+                alertErrorMsg("登录账号不能为空！");
+                return;
+            }
+            if (!checkUser(username)) {
+                alertErrorMsg("登录账号格式不正确！正确格式\"abcd12\"");
+                return;
+            }
+
+            var email = $("#txtemail").val();
+            if (isEmpty(email)) {
+                alertErrorMsg("邮箱地址不能为空，可用于登录或找回密码！");
+                return;
+            }
+
+            if (!CheckMail(email)) {
+                alertErrorMsg("邮箱地址格式不正确！");
+                return;
+            }
+
+            var nickname = $("#txtnickname").val();
+            if (isEmpty(nickname)) {
+                alertErrorMsg("真实姓名不能为空！");
+                return;
+            }
+
+            var pams = {
+                userface: userface,
+                username: username,
+                email: email,
+                nickname: nickname
+            };
+
+            Loading("更新中，请稍后...")
+            $.post("/Center/PersonalUpdate", pams, function (data) {
+                LoadClosed();
+                if (data.status == 0) {
+                    alertSuccessMsg(data.msg);
+                    window.location.reload();
+                } else {
+                    alertErrorMsg(data.msg);
+                }
+            }, "json");
+        }
+    </script>
+}

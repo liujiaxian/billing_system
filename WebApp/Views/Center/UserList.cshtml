@@ -1,0 +1,152 @@
+﻿@{
+    ViewBag.Title = "用户列表";
+    Layout = "~/Views/Shared/_LayoutCenterPage.cshtml";
+    List<Model.sys_user> userList = ViewData["list"] as List<Model.sys_user>;
+}
+
+@section header{
+
+}
+<div class="row">
+    <div class="col-lg-12">
+        <div class="main-box clearfix">
+            <header class="main-box-header clearfix">
+                <h2>
+                    用户列表&nbsp;&nbsp;
+                    <a href="/center/usersave?page=@Html.ViewContext.RouteData.Values["id"]" class="table-link" title="点击添加">
+                        <span class="fa-stack">
+                            <i class="fa fa-square fa-stack-2x"></i>
+                            <i class="fa fa-plus fa-stack-1x fa-inverse"></i>
+                        </span>
+                    </a>
+                </h2>
+            </header>
+            <div class="main-box-body clearfix">
+                <div class="table-responsive">
+                    <table id="table-example-fixed" class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th width="7%">编号</th>
+                                <th width="7%">用户名</th>
+                                <th width="7%">昵称</th>
+                                <th width="7%">邮箱</th>
+                                <th width="5%">角色</th>
+                                <th>用户头像</th>
+                                <th width="8%">申请状态</th>
+                                <th width="8%">登录次数</th>
+                                <th width="12%">最近登录</th>
+                                <th width="12%">创建时间</th>
+                                <th width="12%">更新时间</th>
+                                <th width="8%">操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (userList != null)
+                            {
+                                foreach (var item in userList)
+                                {
+                                    <tr>
+                                        <td>@((userList.IndexOf(item) + 1) + ((ViewBag.Page - 1) * ViewBag.PageSize))</td>
+                                        <td>@item.user_name</td>
+                                        <td>@item.user_nickname</td>
+                                        <td><span class="label label-warning">@item.user_email</span></td>
+                                        <td><span class="label label-info">@Enum.GetName(typeof(Utility.Enum_User),item.user_role)</span></td>
+
+                                        <td><img src="@item.user_face" style="width:60px;height:60px;border-radius:50%;" /></td>
+                                        <td>@Enum.GetName(typeof(Utility.Enum_Member_Status),item.apply_status)</td>
+
+
+                                        <td><span class="label label-primary">@item.login_count</span></td>
+                                        <td>@Convert.ToDateTime(item.login_time).ToString("yyyy-MM-dd HH:mm:ss")</td>
+                                        <td>@Convert.ToDateTime(item.create_time).ToString("yyyy-MM-dd HH:mm:ss")</td>
+                                        <td>@Convert.ToDateTime(item.update_time).ToString("yyyy-MM-dd HH:mm:ss")</td>
+                                        <td>
+                                            <a href="/center/usersave/@item.user_id?page=@Html.ViewContext.RouteData.Values["id"]" class="table-link" title="点击编辑">
+                                                <span class="fa-stack">
+                                                    <i class="fa fa-square fa-stack-2x"></i>
+                                                    <i class="fa fa-pencil fa-stack-1x fa-inverse"></i>
+                                                </span>
+                                            </a>
+                                            <a href="javascript:;" class="table-link danger" title="点击删除" onclick="btn_delete('/center/userdelete','@item.user_id')">
+                                                <span class="fa-stack">
+                                                    <i class="fa fa-square fa-stack-2x"></i>
+                                                    <i class="fa fa-trash-o fa-stack-1x fa-inverse"></i>
+                                                </span>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr><td colspan="12">暂无用户记录！</td></tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+                <ul class="pagination pull-right">
+                    @Html.Raw(MyPageBar.PageSortCenter((int)ViewBag.Page, (int)ViewBag.PageCount, ViewBag.Params))
+                </ul>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+
+
+
+
+@section footer{
+    @*<script src="/Content/js/jquery.dataTables.js"></script>
+        <script src="/Content/js/dataTables.fixedHeader.js"></script>
+        <script src="/Content/js/dataTables.tableTools.js"></script>
+        <script src="/Content/js/jquery.dataTables.bootstrap.js"></script>*@
+    <script>
+        $(document).ready(function () {
+            //var table = $('#table-example').dataTable({
+            //    'info': false,
+            //    'sDom': 'lTfr<"clearfix">tip',
+            //    'oTableTools': {
+            //        'aButtons': [
+            //            {
+            //                'sExtends': 'collection',
+            //                'sButtonText': '<i class="fa fa-cloud-download"></i>&nbsp;&nbsp;&nbsp;<i class="fa fa-caret-down"></i>',
+            //                'aButtons': ['csv', 'xls', 'pdf', 'copy', 'print']
+            //            }
+            //        ]
+            //    }
+            //});
+
+            //var tt = new $.fn.dataTable.TableTools( table );
+            //$(tt.fnContainer()).insertBefore('div.dataTables_wrapper');
+
+            //var tableFixed = $('#table-example-fixed').dataTable({
+            //    'info': false,
+            //    'pageLength': 20,
+            //    'sDom': 'lTfr<"clearfix">tip',
+
+            //    'oTableTools': {
+            //        'aButtons': [
+            //            {
+            //                'sExtends': 'collection',
+            //                'sButtonText': '<i class="fa fa-cloud-download"></i>&nbsp;&nbsp;&nbsp;<i class="fa fa-caret-down"></i>',
+            //                'aButtons': ['csv', 'xls', 'pdf', 'copy', 'print']
+            //            }
+            //        ]
+            //    }
+            //});
+
+            //new $.fn.dataTable.FixedHeader(tableFixed);
+
+            //var tt = new $.fn.dataTable.TableTools(tableFixed);
+            //$(tt.fnContainer()).insertBefore('div.dataTables_wrapper');
+        });
+
+
+        function btn_billing_delete(id, isdelete) {
+            btn_delete("/Center/BillingDelete", id, isdelete);
+        }
+    </script>
+}

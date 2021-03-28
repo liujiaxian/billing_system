@@ -1,0 +1,74 @@
+﻿@{
+    ViewBag.Title = "重置密码";
+    Layout = "~/Views/Shared/_LayoutAccountPage.cshtml";
+}
+
+<div id="login-box-holder">
+    <div class="row">
+        <div class="col-xs-12">
+            <header id="login-header">
+                <div id="login-logo">
+                    <a href="/">
+                        <img src="/Content/img/logo.png" alt="记账系统" /></a>
+                </div>
+            </header>
+            <div id="login-box-inner">
+                <div role="form">
+                    <div class="input-group">
+                        <span class="input-group-addon"><i class="fa fa-key"></i></span>
+                        <input class="form-control" type="password" placeholder="新密码" id="txtpwd">
+                    </div>
+                    <div class="input-group">
+                        <span class="input-group-addon"><i class="fa fa-key"></i></span>
+                        <input type="password" class="form-control" placeholder="确认密码" id="txtrepwd">
+                    </div>
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <button class="btn btn-success col-xs-12" onclick="btn_forgetpwd_reset()">重置密码</button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+@section footer{
+    <script type="text/javascript">
+        function btn_forgetpwd_reset() {
+            var pwd = $("#txtpwd").val().trim();
+            if (isEmpty(pwd)) {
+                alertErrorMsg("密码不能为空！");
+                return;
+            }
+            if (pwd.length < 6) {
+                alertErrorMsg("密码不能小于6个字符！");
+                return;
+            }
+            var repwd = $("#txtrepwd").val().trim();
+            if (pwd!=repwd) {
+                alertErrorMsg("密码与确认密码不一致！");
+                return;
+            }
+
+            var pams = {
+                email :'@Request["email"]',
+                pwd: hex_md5(pwd)
+            };
+
+            Loading("重置中，请稍后...")
+            $.post("/Account/ForgetPwdReset", pams, function (data) {
+                LoadClosed();
+                if (data.status == 0) {
+                    alertSuccessMsg(data.msg);
+                    window.location = "/account/login";
+                } else {
+                    alertErrorMsg(data.msg);
+                }
+            }, "json");
+
+        }
+    </script>
+      
+}

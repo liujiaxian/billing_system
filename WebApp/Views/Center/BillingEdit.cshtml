@@ -1,0 +1,209 @@
+﻿@{
+    ViewBag.Title = "账单编辑";
+    Layout = "~/Views/Shared/_LayoutCenterPage.cshtml";
+    Model.billing_log billing = ViewData["billingmodel"] as Model.billing_log;
+    List<Model.vyw_team_user> teamlist = ViewData["teamlist"] as List<Model.vyw_team_user>;
+}
+
+
+@section header{
+    <style type="text/css">
+        .radio {
+            padding-left: 8px;
+        }
+    </style>
+}
+<div class="row">
+    <div class="col-lg-12">
+        <div class="main-box">
+            <header class="main-box-header clearfix">
+                <h2>账单记录编辑</h2>
+            </header>
+            <div class="main-box-body clearfix">
+                <div class="form-group">
+                    <label>所属团队</label>
+                    <select class="form-control" id="txtteam">
+                        @if (teamlist.Count > 0)
+                        {
+                            foreach (var item in teamlist)
+                            {
+                                if (item.teamID == billing.team_id)
+                                {
+                                    <option selected value="@item.teamID">@item.teamName</option>
+                                }
+                                else
+                                {
+                                    <option value="@item.teamID">@item.teamName</option>
+                                }
+                            }
+                        }
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>账单类型</label>
+                    <div class="radio">
+                        <input type="radio" name="optionsRadios" id="optionsRadios1" value="true" @Html.Raw(billing.trade_type == true ? "checked" : "")>
+                        <label for="optionsRadios1">
+                            支出
+                        </label>
+                    </div>
+                    <div class="radio">
+                        <input type="radio" name="optionsRadios" id="optionsRadios2" value="false" @Html.Raw(billing.trade_type == false ? "checked" : "")>
+                        <label for="optionsRadios2">
+                            收入
+                        </label>
+                    </div>
+                </div>
+                @{List<Model.sys_user> userlist = ViewData["userlist"] as List<Model.sys_user>;}
+                <div class="form-group">
+                    <label>交易用户</label>
+                    <select class="form-control" id="txttradeuser">
+                        @if (userlist.Count > 0)
+                        {
+                            foreach (var item in userlist)
+                            {
+                                if (item.user_id == (long)(billing.user_id))
+                                {
+                                    <option selected value="@item.user_id">@item.user_nickname</option>
+                                }
+                                else
+                                {
+                                    <option value="@item.user_id">@item.user_nickname</option>
+                                }
+                            }
+                        }
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>参与人员</label>
+                    <br>
+                    @if (userlist.Count > 0)
+                    {
+                        foreach (var item in userlist)
+                        {
+                            <div class="checkbox-nice checkbox-inline">
+                                <input type="checkbox" id="checkbox-inl-@item.user_id" value="@item.user_id" data-name="@item.user_nickname">
+                                <label for="checkbox-inl-@item.user_id">
+                                    @item.user_nickname
+                                </label>
+                            </div>
+                        }
+                    }
+                </div>
+
+                <div class="form-group">
+                    <label class="control-label" for="inputSuccess">交易金额</label>
+                    <input type="text" class="form-control" id="txttrademoney" value="@Convert.ToDecimal(billing.money).ToString("0.00").Replace("-","")">
+                    <span class="help-block"><i class="icon-ok-sign"></i>不需要输入正负数，格式12.05</span>
+                </div>
+
+                <div class="form-group">
+                    <label for="txtbillingdetail">账单详细</label>
+                    <textarea class="form-control" id="txtbillingdetail" rows="5" placeholder="支出或收入的说明">@billing.remark</textarea>
+                </div>
+
+                <div class="form-group">
+                    <label class="control-label" for="txtbillingtime">交易时间</label>
+                    <input type="text" class="form-control" id="txtbillingtime" onfocus="WdatePicker({ dateFmt: 'yyyy-MM-dd HH:mm:ss' })" readonly="readonly" value="@Convert.ToDateTime(billing.trade_time).ToString("yyyy-MM-dd HH:mm:ss")">
+                </div>
+
+                <button class="btn btn-success" onclick="btn_billing_edit()">确定编辑</button>&nbsp;&nbsp;
+                <button class="btn btn-info" onclick="window.location = '/center/billing/@Request["page"]'">返回列表</button>
+                <br>
+                <br>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+@section footer{
+    <script src="~/Content/My97DatePicker/WdatePicker.js"></script>
+    <script type="text/javascript">
+        $(function () {
+            var current_participant_name = "@billing.participant_user_id";
+            $("input[type=checkbox]").each(function () {
+                if (current_participant_name.indexOf($(this).val())!=-1) {
+                    $(this).prop("checked",true);
+                }
+            });
+        })
+
+
+        function btn_billing_edit() {
+            var id = "@billing.billing_id";
+
+            var teamid = $("#txtteam").val();
+            if (parseInt(teamid) == 0) {
+                alertErrorMsg("请选择团队！");
+                return;
+            }
+
+            var type = $("input[name=optionsRadios]:checked").val();
+
+            var tradeuserid = $("#txttradeuser").val();
+
+            var tradeuser = $("#txttradeuser option:selected").text();
+
+            var participant = new Array();
+            var participant_name = new Array();
+            $("input[type=checkbox]").each(function () {
+                if ($(this).prop("checked")) {
+                    participant.push($(this).val());
+                    participant_name.push($(this).attr("data-name"));
+                }
+            });
+
+            if (isEmpty(participant)) {
+                alertErrorMsg("请选择参与人员！");
+                return;
+            }
+
+            var trademoney = $("#txttrademoney").val();
+            if (isEmpty(trademoney)) {
+                alertErrorMsg("交易金额不能为空！");
+                return;
+            }
+
+
+            if (!checkMoney(trademoney)) {
+                alertErrorMsg("金额格式不正确！");
+                return;
+            }
+
+            var billingdetail = $("#txtbillingdetail").val();
+
+            var billingtime = $("#txtbillingtime").val();
+            if (isEmpty(billingtime)) {
+                alertErrorMsg("交易时间不能为空！");
+                return;
+            }
+
+            var pams = {
+                type: type,
+                participant: participant.toString(),
+                trademoney: trademoney,
+                tradedetail: billingdetail,
+                tradetime: billingtime,
+                tradeuser: tradeuser,
+                tradeuserid:tradeuserid,
+                id: id,
+                teamid: teamid,
+                participant_name:participant_name.toString()
+            };
+
+            Loading("更新中，请稍后...")
+            $.post("/Center/BillingEdit", pams, function (data) {
+                LoadClosed();
+                if (data.status == 0) {
+                    alertSuccessMsg(data.msg);
+                    window.location = "/center/billing/@Request["page"]";
+                } else {
+                    alertErrorMsg(data.msg);
+                }
+            }, "json");
+        }
+    </script>
+}
